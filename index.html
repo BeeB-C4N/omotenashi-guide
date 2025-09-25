@@ -348,14 +348,14 @@ async function generatePDF() {
     for (let i = 0; i < chunks.length; i++) {
         renderPreviewForPDF(chunks[i]);
         await new Promise(resolve => setTimeout(resolve, 50));
-        const canvas = await html2canvas(document.getElementById('preview-sheet'), { scale: 3, useCORS: true, allowTaint: true, backgroundColor: null });
+        const canvas = await html2canvas(document.getElementById('preview-sheet'), { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null });
         const imgData = canvas.toDataURL('image/png');
         const imgProps = pdf.getImageProperties(imgData);
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
         const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
         if (i > 0) pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, 0, imgProps.width * ratio, imgProps.height * ratio);
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgProps.width * ratio, imgProps.height * ratio);
     }
     
     currentPage = originalPage;
