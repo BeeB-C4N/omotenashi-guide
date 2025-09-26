@@ -30,7 +30,6 @@
         #card-grid.portrait { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); }
         #card-grid.landscape { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); }
         #preview-footer { padding: 0.5rem 1.5rem; background-color: rgba(249, 250, 251, 0.9); color: #6b7280; font-size: 0.6rem; text-align: center; flex-shrink: 0; border-top: 1px solid #e5e7eb; }
-        /* [変更] カード背景の不透明度を95%に変更 */
         .card-item { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem; display: flex; flex-direction: column; overflow: hidden; background-color: rgba(255,255,255,0.95); }
         .card-header { display: flex; align-items: center; padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #f3f4f6; flex-shrink: 0; }
         .card-header-title { font-size: 0.8rem; font-weight: 600; }
@@ -68,9 +67,20 @@
     </div>
 
     <div class="container mx-auto p-4 md:p-8">
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">石川県インバウンド対応店 注意書きジェネレーター</h1>
-            <p class="text-gray-600 mt-2">外国人のお客様へのご案内を簡単作成・PDF出力</p>
+        <!-- [変更] ヘッダーにフィードバックボタンを追加 -->
+        <header class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">石川県インバウンド対応店 注意書きジェネレーター</h1>
+                <p class="text-gray-600 mt-2">外国人のお客様へのご案内を簡単作成・PDF出力</p>
+            </div>
+            <div>
+                <a href="https://forms.gle/NAPsSjZKjBF45Zc39" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
+                    </svg>
+                    ツールのフィードバックをお寄せください
+                </a>
+            </div>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -179,7 +189,6 @@ let currentPage = 1;
 
 // --- イベントリスナー設定 ---
 function setupEventListeners() {
-    // ... (イベントリスナーのコード) ...
     const inputs = document.querySelectorAll('.lang-checkbox, .layout-radio, .checkbox-item');
     inputs.forEach(el => {
         el.addEventListener('change', () => {
@@ -230,7 +239,6 @@ async function generatePDF() {
 
     if (chunks.length === 0) {
         if(!document.getElementById('survey-modal').classList.contains('hidden')) {
-             // アンケートが表示されている場合でも、ダウンロードするものがない場合はローダーを隠す
              loader.classList.add('hidden');
         }
         return;
@@ -270,7 +278,6 @@ async function generatePDF() {
     } finally {
         currentPage = originalPage;
         renderPreview();
-        // アンケートが表示されている場合は、ローダーだけを隠す
         if(!document.getElementById('survey-modal').classList.contains('hidden')) {
             loader.classList.add('hidden');
         }
@@ -413,4 +420,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
