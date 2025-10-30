@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>石川県インバウンド対応店 注意書きジェネレーター</title>
-    <!-- Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts --><link rel="preconnect" href="https://fonts.googleapis.com">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- PDF生成ライブラリ --><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- PDF生成ライブラリ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { font-family: 'Inter', 'Noto Sans JP', sans-serif; }
@@ -24,17 +30,16 @@
         #preview-header { padding: 0.75rem 1.5rem; border-bottom: 1px solid #e5e7eb; text-align: center; flex-shrink: 0; background-color: rgba(255,255,255,0.95); }
         #preview-header h2 { font-size: 1.1rem; font-weight: 700; color: #1f2937; }
         
-        /* [修正] グリッドの行の高さを初期値はmin-contentに設定 */
+        /* [修正] 内部の余白(padding)と隙間(gap)を調整 */
         #card-grid {
             flex-grow: 1;
-            padding: 1rem;
+            padding: 0.75rem; /* 余白を調整 */
             display: grid;
-            gap: 1rem;
+            gap: 0.75rem; /* 隙間を調整 */
             overflow: hidden;
             grid-template-columns: repeat(2, 1fr);
-            grid-auto-rows: min-content; /* デフォルトをコンテンツに合わせる */
+            grid-auto-rows: min-content; 
         }
-        /* [追加] ページネーション時に1frに戻すクラス */
         #card-grid.fill-rows {
              grid-auto-rows: 1fr;
         }
@@ -72,7 +77,8 @@
         <p>PDFを生成中です...</p>
     </div>
 
-    <!-- アンケート用モーダル --><div id="survey-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50">
+    <!-- アンケート用モーダル -->
+    <div id="survey-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl h-full max-h-[90vh] flex flex-col">
             <div class="p-4 border-b">
                 <h3 class="text-lg font-medium text-gray-900">今後のサービス改善にご協力ください</h3>
@@ -132,6 +138,11 @@
                 </div>
             </div>
         </main>
+        
+        <!-- [追加] ページ全体のフッター -->
+        <footer class="text-center text-sm text-gray-500 mt-8 pb-4">
+            石川県観光戦略部国際観光課 TEL:000-000-0000
+        </footer>
     </div>
 
 <script>
@@ -294,7 +305,7 @@ const phrasesData = {
                 jp_label: '混雑時は、料理の提供やスタッフのご対応にお時間をいただく場合があります。',
                 content: {
                     en: { title: 'Service Delays', description: 'Please note that, when we are particularly busy, it may take longer than usual to prepare your food, or for staff members to assist you.'},
-                    zh: { title: '關於等待時間', description: '用餐人數眾多時，店員的服務及料理の提供可能需要稍加等候。'}
+                    zh: { title: '關於等待時間', description: '用餐人數眾多時，店員の服務及料理の提供可能需要稍加等候。'}
                 }
             },
             call_staff_new: {
@@ -308,7 +319,8 @@ const phrasesData = {
     }
 };
 
-const CARDS_PER_PAGE_PAGE1 = 6;
+// [変更] 1ページ目のカード数を4に変更
+const CARDS_PER_PAGE_PAGE1 = 4;
 const CARDS_PER_PAGE_NORMAL = 8;
 let currentPage = 1;
 
@@ -416,7 +428,6 @@ function setupEventListeners() {
     });
 }
 
-// --- プレビュー描画関数 ---
 function renderPreview() {
     const allCheckedItemKeys = getCheckedItemKeys();
     const selectedLangs = getSelectedLangs();
@@ -435,12 +446,12 @@ function renderPreview() {
     let itemsForThisPage;
     if (currentPage === 1) {
         itemsForThisPage = allCheckedItemKeys.slice(0, CARDS_PER_PAGE_PAGE1);
-        cardGrid.classList.remove('fill-rows'); // [修正] 1ページ目はmin-content
+        cardGrid.classList.remove('fill-rows');
     } else {
         const startIndex = CARDS_PER_PAGE_PAGE1 + (currentPage - 2) * CARDS_PER_PAGE_NORMAL;
         const endIndex = startIndex + CARDS_PER_PAGE_NORMAL;
         itemsForThisPage = allCheckedItemKeys.slice(startIndex, endIndex);
-        cardGrid.classList.add('fill-rows'); // [修正] 2ページ目以降は1fr
+        cardGrid.classList.add('fill-rows');
     }
 
     cardGrid.innerHTML = ''; 
@@ -543,6 +554,7 @@ function updatePaginationControls() {
 
 function getTotalPages() {
     const totalItems = getCheckedItemKeys().length;
+    // [変更] 1ページ目のカード数を 4 に
     if (totalItems <= CARDS_PER_PAGE_PAGE1) {
         return 1;
     } else {
@@ -584,14 +596,18 @@ async function generatePDF() {
             const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
-            const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
             
+            // [修正] 常に幅に合わせるのではなく、アスペクト比を維持してフィットさせる
+            const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
             const imgWidth = imgProps.width * ratio;
-            const x_offset = (pdfWidth - imgWidth) / 2;
-
+            const imgHeight = imgProps.height * ratio;
+            const x_offset = (pdfWidth - imgWidth) / 2; // 中央揃え
+            const y_offset = (pdfHeight - imgHeight) / 2; // 縦も中央揃え (0で良い)
+            
             if (i > 1) pdf.addPage();
             
-            pdf.addImage(imgData, 'JPEG', x_offset, 0, imgWidth, imgProps.height * ratio);
+            // [修正] 中央揃えで配置
+            pdf.addImage(imgData, 'JPEG', x_offset, 0, imgWidth, imgHeight);
         }
         
         pdf.save('ishikawa_omotenashi_guide.pdf');
