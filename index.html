@@ -27,17 +27,15 @@
         #preview-header { padding: 0.75rem 1.5rem; border-bottom: 1px solid #e5e7eb; text-align: center; flex-shrink: 0; background-color: rgba(255,255,255,0.95); }
         #preview-header h2 { font-size: 1.1rem; font-weight: 700; color: #1f2937; }
         
-        /* [修正] grid-auto-rows を常に min-content に固定 */
         #card-grid {
             flex-grow: 1;
             padding: 0.75rem; 
             display: grid;
             gap: 0.75rem; 
-            overflow: hidden;
+            overflow: hidden; /* グリッドエリア全体のはみ出しは隠す */
             grid-template-columns: repeat(2, 1fr);
-            grid-auto-rows: min-content; /* 常にコンテンツの高さに合わせる */
+            grid-auto-rows: min-content; 
         }
-        /* [削除] .fill-rows クラスは不要になったため削除 */
 
         .welcome-message-card {
             grid-column: span 2 / span 2;
@@ -51,9 +49,14 @@
         .welcome-message-card p { font-size: 0.8rem; line-height: 1.5; }
         
         #preview-footer { padding: 0.5rem 1.5rem; background-color: rgba(249, 250, 251, 0.9); color: #6b7280; font-size: 0.6rem; text-align: center; flex-shrink: 0; border-top: 1px solid #e5e7eb; }
-        .card-item { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem; display: flex; flex-direction: column; overflow: hidden; background-color: rgba(255,255,255,0.95); }
-        .card-body { flex-grow: 1; overflow: hidden; font-size: 0.8rem; line-height: 1.4; }
+        
+        /* [修正] .card-item から overflow: hidden を削除 */
+        .card-item { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem; display: flex; flex-direction: column; background-color: rgba(255,255,255,0.95); }
+        
+        /* [修正] .card-body から overflow: hidden を削除 */
+        .card-body { flex-grow: 1; font-size: 0.8rem; line-height: 1.4; }
         .card-body ul { list-style: disc; padding-left: 1rem; margin-top: 0.5rem; }
+        
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
         #loader.hidden { display: none; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin-bottom: 1rem; }
@@ -422,7 +425,7 @@ function setupEventListeners() {
     });
 }
 
-// --- [修正] プレビュー描画関数 ---
+// --- プレビュー描画関数 (変更なし) ---
 function renderPreview() {
     const allCheckedItemKeys = getCheckedItemKeys();
     const selectedLangs = getSelectedLangs();
@@ -441,12 +444,12 @@ function renderPreview() {
     let itemsForThisPage;
     if (currentPage === 1) {
         itemsForThisPage = allCheckedItemKeys.slice(0, CARDS_PER_PAGE_PAGE1);
-        cardGrid.classList.remove('fill-rows'); // 1ページ目はmin-content
+        cardGrid.classList.remove('fill-rows');
     } else {
         const startIndex = CARDS_PER_PAGE_PAGE1 + (currentPage - 2) * CARDS_PER_PAGE_NORMAL;
         const endIndex = startIndex + CARDS_PER_PAGE_NORMAL;
         itemsForThisPage = allCheckedItemKeys.slice(startIndex, endIndex);
-        cardGrid.classList.add('fill-rows'); // 2ページ目以降は1fr
+        cardGrid.classList.add('fill-rows');
     }
 
     cardGrid.innerHTML = ''; 
