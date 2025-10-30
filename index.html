@@ -15,25 +15,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { font-family: 'Inter', 'Noto Sans JP', sans-serif; }
+        /* [変更] プレビューはA4縦比率に固定 */
         #preview-sheet {
             background-color: white;
             background-image: url('./pattern_inbound.png');
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
+            width: 100%;
+            aspect-ratio: 210 / 297;
         }
-        #preview-sheet.portrait-container { width: 100%; aspect-ratio: 210 / 297; }
-        #preview-sheet.landscape-container { width: 100%; aspect-ratio: 297 / 210; }
         #preview-header { padding: 0.75rem 1.5rem; border-bottom: 1px solid #e5e7eb; text-align: center; flex-shrink: 0; background-color: rgba(255,255,255,0.8); }
         #preview-header h2 { font-size: 1.1rem; font-weight: 700; color: #1f2937; }
-        #card-grid { flex-grow: 1; padding: 1rem; display: grid; gap: 1rem; overflow: hidden; }
-        #card-grid.portrait { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); }
-        #card-grid.landscape { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); }
+        /* [変更] グリッドは常に縦向き (2列) */
+        #card-grid {
+            flex-grow: 1;
+            padding: 1rem;
+            display: grid;
+            gap: 1rem;
+            overflow: hidden;
+            grid-template-columns: repeat(2, 1fr);
+            /* 行の高さは自動調整 */
+            grid-auto-rows: 1fr;
+        }
+        /* [追加] 1ページ目の協力依頼文用のスタイル */
+        .welcome-message-card {
+            grid-column: span 2 / span 2; /* 2列分の幅を使用 */
+            grid-row: span 1 / span 1;   /* 1行分の高さを使用 */
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+        .welcome-message-card h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .welcome-message-card p { font-size: 0.75rem; line-height: 1.5; }
+        
         #preview-footer { padding: 0.5rem 1.5rem; background-color: rgba(249, 250, 251, 0.9); color: #6b7280; font-size: 0.6rem; text-align: center; flex-shrink: 0; border-top: 1px solid #e5e7eb; }
         .card-item { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem; display: flex; flex-direction: column; overflow: hidden; background-color: rgba(255,255,255,0.95); }
         .card-header { display: flex; align-items: center; padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #f3f4f6; flex-shrink: 0; }
         .card-header-title { font-size: 0.8rem; font-weight: 600; }
         .card-body { flex-grow: 1; overflow: hidden; font-size: 0.7rem; line-height: 1.4; }
+        .card-body ul { list-style: disc; padding-left: 1rem; margin-top: 0.5rem; }
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
         #loader.hidden { display: none; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin-bottom: 1rem; }
@@ -41,6 +63,9 @@
         .pagination-button:disabled { opacity: 0.5; cursor: not-allowed; }
         .time-input { width: 4rem; text-align: center; border-radius: 0.25rem; border: 1px solid #d1d5db; padding: 0.25rem; margin: 0 0.25rem; }
         .time-input:disabled { background-color: #f3f4f6; cursor: not-allowed; }
+        /* [追加] ラジオボタン用 */
+        .radio-label { margin-left: 0.5rem; font-weight: normal; }
+        .radio-group { display: flex; gap: 1rem; }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -67,17 +92,14 @@
     </div>
 
     <div class="container mx-auto p-4 md:p-8">
-        <!-- ヘッダーにフィードバックボタンを追加 -->
         <header class="mb-8 flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">石川県インバウンド対応店 注意書きジェネレーター</h1>
                 <p class="text-gray-600 mt-2">外国人のお客様へのご案内を簡単作成・PDF出力</p>
             </div>
             <div>
-                <a href="https://forms.gle/Wi5PZfYGDK4G3jAT9" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
-                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
-                    </svg>
+                <a href="https://forms.gle/NAPsSjZKjBF45Zc39" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" /></svg>
                     ツールのフィードバックをお寄せください
                 </a>
             </div>
@@ -85,30 +107,25 @@
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <aside id="control-panel" class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
-                <!-- UI部分 -->
+                <!-- [変更] 言語選択から韓国語を削除 -->
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">表示言語 (複数選択可)</label>
                     <div id="language-selection" class="space-y-2">
                         <div><input id="lang-en" value="en" type="checkbox" checked class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-checkbox"><label for="lang-en" class="ml-2 text-sm text-gray-800">English (英語)</label></div>
                         <div><input id="lang-zh" value="zh" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-checkbox"><label for="lang-zh" class="ml-2 text-sm text-gray-800">中文 (中国語)</label></div>
-                        <div><input id="lang-ko" value="ko" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-checkbox"><label for="lang-ko" class="ml-2 text-sm text-gray-800">한국어 (韓国語)</label></div>
                     </div>
                 </div>
-                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">レイアウト</label>
-                    <div class="flex items-center space-x-4">
-                         <div><input id="layout-portrait" name="layout" value="portrait" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 layout-radio"><label for="layout-portrait" class="ml-2 text-sm text-gray-800">縦向き</label></div>
-                         <div><input id="layout-landscape" name="layout" value="landscape" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 layout-radio"><label for="layout-landscape" class="ml-2 text-sm text-gray-800">横向き</label></div>
-                    </div>
-                </div>
+                <!-- [変更] レイアウト選択を削除 -->
                 <div id="checklist-sections"></div>
             </aside>
 
             <div class="lg:col-span-2">
-                <div id="preview-sheet-wrapper">
-                    <div id="preview-sheet" class="portrait-container">
+                 <div id="preview-sheet-wrapper">
+                    <!-- [変更] プレビューコンテナのクラスを縦向きに固定 -->
+                    <div id="preview-sheet">
                         <header id="preview-header"><h2>お客様へのお知らせ / Information for our Guests</h2></header>
-                        <main id="card-grid" class="portrait"></main>
+                        <!-- [変更] グリッドのクラスを縦向きに固定 -->
+                        <main id="card-grid"></main>
                         <footer id="preview-footer"><p>※掲載内容は変更になる場合がございます。ご不明な点はスタッフまでお尋ねください。/ The contents are subject to change. Please ask our staff if you have any questions.</p></footer>
                     </div>
                     <div id="placeholder" class="text-center text-gray-500 py-16 bg-white rounded-lg shadow-md">選択した項目がここにプレビューされます。</div>
@@ -126,49 +143,151 @@
     </div>
 
 <script>
-// --- データ定義 ---
+// --- [変更] データ定義 ---
+
+// 1ページ目に表示する協力依頼文
+const welcomeMessageData = {
+    en: {
+        title: 'Information for Our Guests before the Meal',
+        description: 'Thank you very much for coming today. To ensure you have a pleasant meal, we ask that you please read and understand the following beforehand. We appreciate your understanding, and hope you enjoy your meal.'
+    },
+    zh: {
+        title: '在用餐之前 － 注意事項',
+        description: '感謝您蒞臨本店。為了讓您有良好的用餐體驗，請務必詳讀下列事項。感謝您的理解與協助。'
+    },
+    jp: {
+        title: 'お食事の前に － お客様へのお願い',
+        description: 'ご来店いただきありがとうございます。楽しくお食事を楽しんでいただくために、以下の事項について予めお客様にご了承いただきますよう、お願いします。ご理解とご協力の程、よろしくお願いいたします。'
+    }
+};
+
+// 項目データ
 const phrasesData = {
     payment: {
         title: '会計関連',
         items: {
-            cash_only: { jp_label: '会計は現金のみです（クレジットカード不可）', content: { en: { title: 'Cash Only', description: 'We only accept cash. Credit cards are not accepted.' }, zh: { title: '只收现金', description: '本店只接受现金支付，不能使用信用卡。' }, ko: { title: '현금만 가능', description: '현금 결제만 가능합니다. 신용카드는 사용할 수 없습니다.' } } },
-            credit_card_ok: { jp_label: 'クレジットカード利用可能です（暗証番号は4桁のみ）', content: { en: { title: 'Credit Cards Accepted', description: 'We accept credit cards. Please note that only 4-digit PINs are supported.' }, zh: { title: '可使用信用卡', description: '可以使用信用卡。请注意，仅支持4位数密码。' }, ko: { title: '신용카드 사용 가능', description: '신용카드를 사용할 수 있습니다. 4자리 비밀번호만 지원됩니다.' } } },
-            qr_payment: { jp_label: 'QRコード決済に対応しています', content: { en: { title: 'QR Code Payments', description: 'We accept QR code payments.' }, zh: { title: '支持二维码支付', description: '本店支持二维码支付。' }, ko: { title: 'QR 코드 결제 가능', description: 'QR 코드 결제를 지원합니다.' } } },
-            no_split_bill: { jp_label: '会計はグループ単位でまとめてください（個別会計不可）', content: { en: { title: 'No Splitting Bills', description: 'Please pay for your group all together. We do not split bills.' }, zh: { title: '请统一结账', description: '请按组统一结账，不支持分开结账。' }, ko: { title: '계산은 한번에', description: '계산은 그룹 단위로 한 번에 부탁드립니다. 개별 계산은 불가능합니다.' } } }
+            // [追加] 会計のラジオボタン項目
+            payment_options: {
+                jp_label: '会計は以下に対応しています。',
+                hasCustomUI: true, // カスタムUI（ラジオボタン）を持つ
+                content: {
+                    en: { title: 'Payment Methods', description: 'We accept the following payment method(s). For details, please ask a member of our staff.'},
+                    zh: { title: '結帳方式', description: '提供以下結帳方式。詳情請詢問店內人員。'}
+                },
+                options_text: {
+                    en: { yes: 'Yes', no: 'No', cash: 'Cash', card: 'Credit Cards', qr: 'QR-Code Payment', ic: 'Transit IC Cards' },
+                    zh: { yes: '○', no: '×', cash: '現金', card: '信用卡', qr: 'QR Code', ic: '交通IC卡' }
+                }
+            },
+            // [変更] 項目キーを変更
+            no_split_bill_new: {
+                jp_label: '会計はグループ単位でまとめていただきますよう、お願いします。',
+                content: {
+                    en: { title: 'Single Payment', description: 'We ask that you please pay for the entire party together in a single payment.'},
+                    zh: { title: '統一結帳', description: '請以團體為單位結帳。'}
+                }
+            }
         }
     },
     food: {
         title: '食事・メニュー関連',
         items: {
-            otoshi: { jp_label: 'お通しがあります', content: { en: { title: 'About "Otoshi"', description: 'An "Otoshi" (small appetizer) will be served, which is included in the table charge.' }, zh: { title: '关于“お通し”', description: '我们会提供“お通し”（开胃小菜），这包含在座位费中。' }, ko: { title: '‘오토시’에 대하여', description: '‘오토시’(작은 안주)가 제공되며, 이는 자리세에 포함됩니다.' } } },
-            table_charge: { jp_label: 'テーブルチャージがあります', content: { en: { title: 'Table Charge', description: 'Please note that there is a table charge per person.' }, zh: { title: '关于座位费', description: '请注意，每位顾客都会收取座位费。' }, ko: { title: '테이블 요금 안내', description: '1인당 테이블 요금이 있습니다.' } } },
-            market_price: { jp_label: '時価の商品があります。価格は店員にお尋ねください', content: { en: { title: 'Market Price', description: 'Some items are market price. Please ask our staff for today\'s price.' }, zh: { title: '关于时价商品', description: '部分商品为时价，今日价格请询问店员。' }, ko: { title: '싯가 메뉴 안내', description: '일부 메뉴는 싯가입니다. 오늘의 가격은 직원에게 문의하십시오.' } } },
-            allergies: { jp_label: 'アレルギーや食事制限がある場合は事前にお知らせください', content: { en: { title: 'Allergies & Dietary Needs', description: 'If you have any allergies or dietary restrictions, please inform our staff in advance.' }, zh: { title: '关于过敏与饮食限制', description: '如果您有任何过敏或饮食限制，请提前告知我们的工作人员。' }, ko: { title: '알레르기 및 식단 제한', description: '알레르기나 식단 제한이 있으시면 사전에 직원에게 알려주십시오.' } } },
-            dietary_ok: { jp_label: 'ベジタリアン・ビーガン・ハラルなどの対応可能', content: { en: { title: 'Dietary Options Available', description: 'We can accommodate special dietary needs such as vegetarian, vegan, or halal.' }, zh: { title: '可提供特殊饮食', description: '我们可以满足素食、纯素或清真等特殊饮食需求。' }, ko: { title: '특별 식단 가능', description: '채식, 비건, 할랄 등 특별 식단에 대응 가능합니다.' } } },
-            dietary_ng: { jp_label: 'ベジタリアン・ビーガン・ハラルなどの対応不可', content: { en: { title: 'Dietary Options Unavailable', description: 'We are unable to accommodate special dietary needs such as vegetarian, vegan, or halal.' }, zh: { title: '无法提供特殊饮食', description: '本店无法满足素食、纯素或清真等特殊饮食需求。' }, ko: { title: '특별 식단 불가', description: '채식, 비건, 할랄 등 특별 식단에는 대응할 수 없습니다.' } } },
-            dietary_may_ng: { jp_label: '食材制限には対応できない場合があります', content: { en: { title: 'Regarding Dietary Restrictions', description: 'We may not be able to accommodate all specific dietary restrictions.' }, zh: { title: '关于食材限制', description: '我们可能无法满足所有的特定饮食限制。' }, ko: { title: '식재료 제한 안내', description: '모든 식재료 제한에 대응하지 못할 수도 있습니다.' } } },
-            no_set_menu_change: { jp_label: 'セットメニューの一部変更はできません', content: { en: { title: 'No Set Menu Changes', description: 'Changes or substitutions for set menu items are not available.' }, zh: { title: '套餐内容无法变更', description: '套餐的內容無法變更或替換。' }, ko: { title: '세트 메뉴 변경 불가', description: '세트 메뉴의 일부 변경이나 교체는 불가능합니다.' } } },
-            no_take_away: { jp_label: '食べ残しの持ち帰りはご遠慮ください', content: { en: { title: 'No Take-out for Leftovers', description: 'For food safety reasons, please refrain from taking leftover food home.' }, zh: { title: '请勿打包剩菜', description: '为保证食品安全，请不要将剩菜打包带走。' }, ko: { title: '남은 음식 포장 불가', description: '식품 안전을 위해 남은 음식의 포장은 삼가해 주십시오.' } } },
-            free_water: { jp_label: 'お水は無料です', content: { en: { title: 'Complimentary Water', description: 'Water is provided free of charge.' }, zh: { title: '免费饮用水', description: '本店免费提供饮用水。' }, ko: { title: '물은 무료입니다', description: '물은 무료로 제공됩니다.' } } },
-            one_order_per_person: { jp_label: 'お一人１オーダーをお願いします', content: { en: { title: 'One Order Per Person', description: 'We kindly request each customer to order at least one item.' }, zh: { title: '每人最低消费一项', description: '规定每位顾客最低消费一项（餐品或饮品）。' }, ko: { title: '1인 1주문 필수', description: '모든 손님께서는 최소 1개 이상의 메뉴를 주문해 주시기 바랍니다.' } } },
-            one_drink_per_person: { jp_label: 'お一人１ドリンクをお願いします', content: { en: { title: 'One Drink Per Person', description: 'We kindly request each customer to order at least one drink.' }, zh: { title: '每人最低消费一杯饮品', description: '规定每位顾客最低消费一杯饮品。' }, ko: { title: '1인 1음료 주문 필수', description: '모든 손님께서는 최소 1개 이상의 음료를 주문해 주시기 바랍니다.' } } }
+            otoshi_charge: {
+                jp_label: 'お席料として"お通し"をお出しします。',
+                content: {
+                    en: { title: 'About "Otoshi" (Appetizer)', description: 'This restaurant serves o-toshi, a small appetizer included as part of the seating charge. This is a common custom at izakaya restaurants in Japan.'},
+                    zh: { title: '關於「開胃小菜」', description: '我們將提供「開胃小菜」作為座位費用。「開胃小菜」是讓您等待上菜時享用的料理，屬於日本居酒屋文化常見的習慣。'}
+                }
+            },
+            table_charge_only: {
+                jp_label: 'お席料（テーブルチャージ）を頂戴しております。',
+                content: {
+                    en: { title: 'Seating Charge', description: 'We have a seating charge.'},
+                    zh: { title: '座位費用', description: '會收取座位費用。'}
+                }
+            },
+            market_price_new: {
+                jp_label: '一部商品は"時価"です。価格はお尋ねください。',
+                content: {
+                    en: { title: 'About "Market Price"', description: 'Some of our menu items are “market price,” due to prices that can vary from day to day for items such as fresh seafood. Please ask for today’s price if you are interested.'},
+                    zh: { title: '關於「時價」', description: '部分商品採用「時價」計價。請向店內人員詢價。採用「時價」的商品，會隨著鮮魚等貨物的進貨成本而波動。'}
+                }
+            },
+            dietary_restrictions: {
+                jp_label: 'アレルギーや宗教・思想などによる食事制限につきましては、可能な範囲で対応します。',
+                content: {
+                    en: { title: 'Dietary Restrictions', description: 'Please let us know if you have any food allergies, or dietary restrictions (religious or otherwise), and we will try to accommodate them as much as we can.'},
+                    zh: { title: '飲食限制', description: '因過敏、宗教、理念等原因而有飲食限制的客人，我們會在能力範圍內為您提供服務，請事先告知相關需求。'}
+                }
+            },
+            no_take_away_new: {
+                jp_label: '食べ残しのお持ち帰りはご遠慮ください。',
+                content: {
+                    en: { title: 'No Take-out for Leftovers', description: 'We do not offer take-out for leftover food.'},
+                    zh: { title: '請勿打包剩菜', description: '請勿將吃剩的食物打包帶走。'}
+                }
+            },
+            paid_water: {
+                jp_label: 'お水は有料でのご提供となります。',
+                content: {
+                    en: { title: 'Water', description: 'Water is available, but as a paid menu item.'},
+                    zh: { title: '飲用水', description: '飲用水需付費。'}
+                }
+            },
+            one_order_rule: {
+                jp_label: 'お一人様１品以上 ・1ドリンク以上のご注文をお願いします',
+                content: {
+                    en: { title: 'Minimum Order', description: 'We ask that you please order at least one menu item and at least one drink per person.'},
+                    zh: { title: '最低消費', description: '每人需點1項餐點、1杯飲品'}
+                }
+            }
         }
     },
     manners: {
         title: 'マナー・行動関連',
         items: {
-            no_loud_noise: { jp_label: '店内での大声や騒音はご遠慮ください', content: { en: { title: 'Keep Voices Down', description: 'Please be considerate of other guests and refrain from loud conversations or making noise.' }, zh: { title: '请保持安静', description: '请顾及其他客人，避免大声喧哗或制造噪音。' }, ko: { title: '소음 주의', description: '다른 손님을 배려하여 큰 소리로 대화하거나 소음을 내는 것을 삼가해 주십시오.' } } },
-            ask_for_photos: { jp_label: '店内での撮影する場合は店員にご確認ください', content: { en: { title: 'Photography', description: 'Please ask our staff for permission before taking photos or videos inside.' }, zh: { title: '关于拍照', description: '在店内拍照或录像前，请先征求工作人员的同意。' }, ko: { title: '촬영 안내', description: '촬영 시에는 직원에게 먼저 허락을 구해 주십시오.' } } },
-            no_outside_food: { jp_label: '店内での飲食物の持ち込みはご遠慮ください', content: { en: { title: 'No Outside Food or Drinks', description: 'Please do not bring in any outside food or drinks.' }, zh: { title: '请勿携带外带食物', description: '请勿携带任何外来食物或饮料。' }, ko: { title: '외부 음식물 반입 금지', description: '외부 음식물 반입은 삼가해 주십시오.' } } },
-            smoking_area: { jp_label: '喫煙は指定の場所でお願いします', content: { en: { title: 'Smoking Area', description: 'If you wish to smoke, please use the designated smoking area.' }, zh: { title: '关于吸烟', description: '如需吸烟，请在指定的吸烟区。' }, ko: { title: '흡연 구역 안내', description: '흡연은 지정된 장소에서만 부탁드립니다.' } } },
-            no_smoking: { jp_label: '店内は禁煙です', content: { en: { title: 'Non-Smoking', description: 'Our entire establishment is non-smoking.' }, zh: { title: '店内禁烟', description: '本店所有区域均为禁烟区。' }, ko: { title: '매장 내 금연', description: '저희 매장 모든 공간은 금연입니다.' } } },
-            seat_time_limit: {
-                hasInput: true,
-                jp_label: '混雑時はお席を<input type="number" id="seat_time_limit-input" class="time-input" value="2" min="0.5" step="0.5" disabled>時間とさせていただきます',
+            ask_for_photos_new: {
+                jp_label: '店内撮影はプライバシーや雰囲気保持のため、事前にスタッフへご確認ください。',
                 content: {
-                    en: { title: 'Seating Time Limit', description: 'During busy hours, seating is limited to {time} hours.' },
-                    zh: { title: '用餐时间限制', description: '繁忙时段，您的用餐时间限制为{time}小时。' },
-                    ko: { title: '좌석 이용 시간', description: '혼잡 시에는 좌석 이용을 {time}시간으로 제한합니다.' }
+                    en: { title: 'Photography', description: 'To ensure a comfortable atmosphere and a shared sense of privacy, please ask the staff for permission before taking any photos while you are here.'},
+                    zh: { title: '關於攝影', description: '為確保客人隱私及店內氛圍，如需在店內攝影請事先和店內工作人員確認。'}
+                }
+            },
+            no_outside_food_new: {
+                jp_label: '飲食物の持ち込みはご遠慮いただいております。',
+                content: {
+                    en: { title: 'No Outside Food or Drinks', description: 'No outside food or drinks are allowed.'},
+                    zh: { title: '禁止攜帶外食', description: '禁止攜帶外食外飲。'}
+                }
+            },
+            smoking_area_new: {
+                jp_label: '喫煙は所定の場所にてお願いします。',
+                content: {
+                    en: { title: 'Smoking Area', description: 'Smoking is allowed only in designated locations.'},
+                    zh: { title: '吸菸區', description: '請在指定場所抽菸。'}
+                }
+            },
+            no_smoking_new: {
+                jp_label: '店内は全席禁煙となっております。',
+                content: {
+                    en: { title: 'Non-Smoking', description: 'All seats are non-smoking.'},
+                    zh: { title: '全面禁菸', description: '店內全面禁菸。'}
+                }
+            },
+            seat_time_limit_fixed: {
+                hasInput: true,
+                jp_label: 'お席は<input type="number" id="seat_time_limit_fixed-input" class="time-input" value="2" min="0.5" step="0.5" disabled>時間制とさせていただいております。',
+                content: {
+                    en: { title: 'Seating Time Limit', description: 'We ask that guests please stay no longer than {time} hours.'},
+                    zh: { title: '用餐時間', description: '用餐時間為{time}小時。'}
+                }
+            },
+            seat_time_limit_busy: {
+                hasInput: true,
+                jp_label: '混雑時は<input type="number" id="seat_time_limit_busy-input" class="time-input" value="2" min="0.5" step="0.5" disabled>時間制とさせていただく場合があります。',
+                content: {
+                    en: { title: 'Seating Time Limit (Busy Hours)', description: 'When we are particularly busy, we ask that guests please stay no longer than {time} hours.'},
+                    zh: { title: '人數眾多時的用餐時間', description: '用餐人數眾多時將調整為{time}小時。'}
                 }
             }
         }
@@ -176,119 +295,97 @@ const phrasesData = {
     communication: {
         title: 'コミュニケーション関連',
         items: {
-            language_barrier: { jp_label: 'スタッフによる言語対応が難しい場合があります', content: { en: { title: 'Language Support', description: 'Our staff may have difficulty communicating in languages other than Japanese.' }, zh: { title: '关于语言沟通', description: '我们的工作人员可能难以用日语以外的语言进行沟通。' }, ko: { title: '언어 지원 안내', description: '직원의 외국어 대응이 어려울 수 있습니다.' } } },
-            translation_app: { jp_label: '必要に応じて翻訳アプリを活用させていただきます', content: { en: { title: 'Translation App', description: 'We may use a translation app to assist with communication.' }, zh: { title: '关于翻译应用', description: '我们可能会使用翻译应用来协助沟通。' }, ko: { title: '번역 앱 사용 안내', description: '필요에 따라 번역 앱을 활용하여 소통하겠습니다.' } } },
-            service_delay: { jp_label: '店内の混雑状況により対応が遅れる場合があります', content: { en: { title: 'Service Delays', description: 'Please be aware that service may be slower during busy hours.' }, zh: { title: '服务延迟的可能性', description: '请您谅解，繁忙时段服务可能会有所延迟。' }, ko: { title: '서비스 지연 안내', description: '매장이 혼잡할 경우 대응이 늦어질 수 있습니다.' } } },
-            call_staff: { jp_label: '店員にご用がありましたら直接もしくは呼び鈴にてお呼びください', content: { en: { title: 'Getting Staff\'s Attention', description: 'If you need assistance, please speak to our staff directly or use the call bell on your table.' }, zh: { title: '如何呼叫店员', description: '如果您需要帮助，请直接呼叫工作人员或使用桌上的呼叫铃。' }, ko: { title: '직원 호출 방법', description: '도움이 필요하시면 직원을 직접 부르시거나 테이블의 호출벨을 이용해 주십시오.' } } }
+            language_barrier_new: {
+                jp_label: 'スタッフによる言語対応が難しい場合があります。ご了承ください。',
+                content: {
+                    en: { title: 'Language Support', description: 'Our staff may not be able to communicate in any language other than Japanese. We appreciate your understanding.'},
+                    zh: { title: '語言溝通', description: '工作人員可能無法順利與您溝通。敬請見諒。'}
+                }
+            },
+            service_delay_new: {
+                jp_label: '混雑時は、料理の提供やスタッフのご対応にお時間をいただく場合があります。',
+                content: {
+                    en: { title: 'Service Delays', description: 'Please note that, when we are particularly busy, it may take longer than usual to prepare your food, or for staff members to assist you.'},
+                    zh: { title: '關於等待時間', description: '用餐人數眾多時，店員的服務及料理的提供可能需要稍加等候。'}
+                }
+            },
+            call_staff_new: {
+                jp_label: 'ご用の際は直接または呼び鈴（ベル等）でお呼びください。',
+                content: {
+                    en: { title: 'Getting Staff\'s Attention', description: 'If you need anything, please let a staff member know directly, or use the bell at the table.'},
+                    zh: { title: '呼叫店員', description: '如需協助請按下呼叫鈴或直接招呼店員。'}
+                }
+            }
         }
     }
 };
 
-const CARDS_PER_PAGE = 8;
+// --- [変更] ページあたりのカード数定義 ---
+const CARDS_PER_PAGE_PAGE1 = 6;
+const CARDS_PER_PAGE_NORMAL = 8;
 let currentPage = 1;
 
-// --- イベントリスナー設定 ---
-function setupEventListeners() {
-    const inputs = document.querySelectorAll('.lang-checkbox, .layout-radio, .checkbox-item');
-    inputs.forEach(el => {
-        el.addEventListener('change', () => {
-            currentPage = 1;
-            renderPreview();
-        });
-    });
-
-    const timeInput = document.getElementById('seat_time_limit-input');
-    if (timeInput) {
-        timeInput.addEventListener('input', renderPreview);
-    }
-
-    // PDFダウンロードボタンのイベント
-    document.getElementById('pdf-download-button').addEventListener('click', () => {
-        document.getElementById('survey-modal').classList.remove('hidden');
-        generatePDF();
-    });
-
-    // スキップボタンのイベント
-    document.getElementById('skip-survey-button').addEventListener('click', () => {
-        document.getElementById('survey-modal').classList.add('hidden');
-    });
-
-    document.getElementById('prev-page').addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderPreview(); } });
-    document.getElementById('next-page').addEventListener('click', () => {
-        const totalPages = Math.ceil(getCheckedItemKeys().length / CARDS_PER_PAGE);
-        if (currentPage < totalPages) { currentPage++; renderPreview(); }
-    });
-}
-
-
-// --- PDF生成関数 ---
-async function generatePDF() {
-    const loader = document.getElementById('loader');
-    loader.classList.remove('hidden');
-    
-    const { jsPDF } = window.jspdf;
-    const allCheckedItemKeys = getCheckedItemKeys();
-    const layout = getLayout();
-    const orientation = layout === 'landscape' ? 'l' : 'p';
-    const pdf = new jsPDF(orientation, 'mm', 'a4');
-    
-    const chunks = [];
-    for (let i = 0; i < allCheckedItemKeys.length; i += CARDS_PER_PAGE) {
-        chunks.push(allCheckedItemKeys.slice(i, i + CARDS_PER_PAGE));
-    }
-
-    if (chunks.length === 0) {
-        if(!document.getElementById('survey-modal').classList.contains('hidden')) {
-             loader.classList.add('hidden');
-        }
-        return;
-    };
-
-    const originalPage = currentPage;
-
-    try {
-        for (let i = 0; i < chunks.length; i++) {
-            renderPreviewForPDF(chunks[i]);
-            await new Promise(resolve => setTimeout(resolve, 50));
-
-            const canvas = await html2canvas(document.getElementById('preview-sheet'), {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true,
-                backgroundColor: null
-            });
-            
-            const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
-            
-            if (i > 0) pdf.addPage();
-            
-            pdf.addImage(imgData, 'JPEG', 0, 0, imgProps.width * ratio, imgProps.height * ratio);
-        }
-        
-        pdf.save('restaurant_info.pdf');
-
-    } catch(error) {
-        console.error("PDF generation failed:", error);
-        alert("PDFの生成に失敗しました。");
-    } finally {
-        currentPage = originalPage;
-        renderPreview();
-        if(!document.getElementById('survey-modal').classList.contains('hidden')) {
-            loader.classList.add('hidden');
-        }
-    }
-}
-
-// --- その他の関数 ---
+// --- [変更] チェックリスト生成関数 ---
 function createChecklist() {
     const container = document.getElementById('checklist-sections');
     container.innerHTML = Object.values(phrasesData).map(section => {
+        // [変更] 会計セクションのカスタムUI処理
+        if (section.title === '会計関連') {
+            return `
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">${section.title}</h3>
+                    <div class="space-y-4">
+                        <!-- 1. 共通説明文のチェックボックス -->
+                        <div class="relative flex items-start">
+                            <div class="flex h-6 items-center"><input id="payment_options" name="payment_options" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 checkbox-item"></div>
+                            <div class="ml-3 text-sm leading-6"><label for="payment_options" class="font-medium text-gray-900">${section.items.payment_options.jp_label}</label></div>
+                        </div>
+                        <!-- 2. ○× ラジオボタン -->
+                        <div class="pl-5 space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">－現金</label>
+                                <div class="flex space-x-4 mt-1 radio-group">
+                                    <input id="payment_cash_yes" name="payment_cash" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_cash_yes" class="radio-label">○</label>
+                                    <input id="payment_cash_no" name="payment_cash" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_cash_no" class="radio-label">×</label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">－クレジットカード</label>
+                                <div class="flex space-x-4 mt-1 radio-group">
+                                    <input id="payment_card_yes" name="payment_card" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_card_yes" class="radio-label">○</label>
+                                    <input id="payment_card_no" name="payment_card" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_card_no" class="radio-label">×</label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">－QRコード</label>
+                                <div class="flex space-x-4 mt-1 radio-group">
+                                    <input id="payment_qr_yes" name="payment_qr" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_qr_yes" class="radio-label">○</label>
+                                    <input id="payment_qr_no" name="payment_qr" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_qr_no" class="radio-label">×</label>
+                                </div>
+                            </div>
+                             <div>
+                                <label class="block text-sm font-medium text-gray-700">－交通系IC</label>
+                                <div class="flex space-x-4 mt-1 radio-group">
+                                    <input id="payment_ic_yes" name="payment_ic" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_ic_yes" class="radio-label">○</label>
+                                    <input id="payment_ic_no" name="payment_ic" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_ic_no" class="radio-label">×</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 3. グループ会計のチェックボックス -->
+                        <div class="relative flex items-start">
+                            <div class="flex h-6 items-center"><input id="no_split_bill_new" name="no_split_bill_new" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 checkbox-item"></div>
+                            <div class="ml-3 text-sm leading-6"><label for="no_split_bill_new" class="font-medium text-gray-900">${section.items.no_split_bill_new.jp_label}</label></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 他セクションの通常処理
         const itemsHtml = Object.keys(section.items).map(key => {
+            // payment_options はカスタム処理したのでスキップ
+            if (key === 'payment_options' || key === 'no_split_bill_new') return '';
+            
             const item = section.items[key];
             return `
                 <div class="relative flex items-start">
@@ -296,41 +393,67 @@ function createChecklist() {
                     <div class="ml-3 text-sm leading-6"><label for="${key}" class="font-medium text-gray-900">${item.jp_label}</label></div>
                 </div>`;
         }).join('');
+        
         return `
             <div class="mb-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">${section.title}</h3>
                 <div class="space-y-4">${itemsHtml}</div>
             </div>`;
     }).join('');
-    const timeCheckbox = document.getElementById('seat_time_limit');
-    const timeInput = document.getElementById('seat_time_limit-input');
-    if(timeCheckbox && timeInput) {
-        timeCheckbox.addEventListener('change', (e) => {
-            timeInput.disabled = !e.target.checked;
+    
+    // [変更] 2つの時間入力のイベントリスナーを設定
+    const timeCheckbox1 = document.getElementById('seat_time_limit_fixed');
+    const timeInput1 = document.getElementById('seat_time_limit_fixed-input');
+    if(timeCheckbox1 && timeInput1) {
+        timeCheckbox1.addEventListener('change', (e) => { timeInput1.disabled = !e.target.checked; });
+    }
+    const timeCheckbox2 = document.getElementById('seat_time_limit_busy');
+    const timeInput2 = document.getElementById('seat_time_limit_busy-input');
+    if(timeCheckbox2 && timeInput2) {
+        timeCheckbox2.addEventListener('change', (e) => { timeInput2.disabled = !e.target.checked; });
+    }
+}
+
+// --- [変更] イベントリスナー設定 ---
+function setupEventListeners() {
+    // [変更] .radio-item もリスナー対象に追加
+    const inputs = document.querySelectorAll('.lang-checkbox, .checkbox-item, .radio-item');
+    inputs.forEach(el => {
+        el.addEventListener('change', () => {
+            currentPage = 1;
+            renderPreview();
         });
-    }
+    });
+
+    // [変更] 2つの時間入力のリスナー
+    const timeInputs = document.querySelectorAll('#seat_time_limit_fixed-input, #seat_time_limit_busy-input');
+    timeInputs.forEach(input => {
+        input.addEventListener('input', renderPreview);
+    });
+
+    // PDFダウンロードボタン (変更なし)
+    document.getElementById('pdf-download-button').addEventListener('click', () => {
+        document.getElementById('survey-modal').classList.remove('hidden');
+        generatePDF();
+    });
+
+    // スキップボタン (変更なし)
+    document.getElementById('skip-survey-button').addEventListener('click', () => {
+        document.getElementById('survey-modal').classList.add('hidden');
+    });
+
+    // [変更] ページネーションのロジック
+    document.getElementById('prev-page').addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderPreview(); } });
+    document.getElementById('next-page').addEventListener('click', () => {
+        const totalPages = getTotalPages();
+        if (currentPage < totalPages) { currentPage++; renderPreview(); }
+    });
 }
 
-function findItemByKey(key) {
-    for (const section of Object.values(phrasesData)) {
-        if (section.items[key]) { return section.items[key]; }
-    }
-    return null;
-}
-
-function getSelectedLangs() { return Array.from(document.querySelectorAll('.lang-checkbox:checked')).map(cb => cb.value); }
-function getCheckedItemKeys() { return Array.from(document.querySelectorAll('.checkbox-item:checked')).map(checkbox => checkbox.id); }
-function getLayout() { return document.querySelector('.layout-radio:checked').value; }
-
+// --- [変更] プレビュー描画関数 ---
 function renderPreview() {
     const allCheckedItemKeys = getCheckedItemKeys();
     const selectedLangs = getSelectedLangs();
-    const layout = getLayout();
-    
-    document.getElementById('preview-sheet').classList.toggle('portrait-container', layout === 'portrait');
-    document.getElementById('preview-sheet').classList.toggle('landscape-container', layout === 'landscape');
-    document.getElementById('card-grid').classList.toggle('portrait', layout === 'portrait');
-    document.getElementById('card-grid').classList.toggle('landscape', layout === 'landscape');
     
     if (allCheckedItemKeys.length === 0 || selectedLangs.length === 0) {
         document.getElementById('placeholder').style.display = 'block';
@@ -342,39 +465,124 @@ function renderPreview() {
     document.getElementById('placeholder').style.display = 'none';
     document.getElementById('preview-sheet').style.display = 'flex';
 
-    const startIndex = (currentPage - 1) * CARDS_PER_PAGE;
-    const endIndex = startIndex + CARDS_PER_PAGE;
-    const itemsForThisPage = allCheckedItemKeys.slice(startIndex, endIndex);
+    // [変更] ページごとのアイテムリストを取得
+    let itemsForThisPage;
+    if (currentPage === 1) {
+        itemsForThisPage = allCheckedItemKeys.slice(0, CARDS_PER_PAGE_PAGE1);
+    } else {
+        const startIndex = CARDS_PER_PAGE_PAGE1 + (currentPage - 2) * CARDS_PER_PAGE_NORMAL;
+        const endIndex = startIndex + CARDS_PER_PAGE_NORMAL;
+        itemsForThisPage = allCheckedItemKeys.slice(startIndex, endIndex);
+    }
 
     const cardGrid = document.getElementById('card-grid');
-    cardGrid.innerHTML = itemsForThisPage.map(key => {
+    cardGrid.innerHTML = ''; // 毎回クリア
+
+    // [変更] 1ページ目のみ、協力依頼文を追加
+    if (currentPage === 1) {
+        const welcomeLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')]; // 日本語を先頭に、選択言語を追加
+        const welcomeHtml = welcomeLangs.map(lang => {
+            const data = welcomeMessageData[lang];
+            if (!data) return '';
+            return `<div class="mb-2"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
+        }).join('');
+        cardGrid.innerHTML += `<div class="welcome-message-card">${welcomeHtml}</div>`;
+    }
+
+    // [変更] カードの描画ロジック
+    const cardHtml = itemsForThisPage.map(key => {
         const data = findItemByKey(key);
         if (!data) return '';
-        const cardBodyHtml = selectedLangs.map(lang => {
-            let content = data.content[lang];
-            if (!content) return '';
-            let description = content.description;
-            if (data.hasInput) {
-                const timeValue = document.getElementById('seat_time_limit-input').value || '2';
-                description = description.replace('{time}', timeValue);
-            }
-            return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${content.title}</p><p class="text-gray-600">${description}</p></div>`;
-        }).join('');
+        
+        let cardBodyHtml = '';
+
+        // [変更] payment_options の特別処理
+        if (key === 'payment_options') {
+            const cash_status = document.querySelector('input[name="payment_cash"]:checked').value;
+            const card_status = document.querySelector('input[name="payment_card"]:checked').value;
+            const qr_status = document.querySelector('input[name="payment_qr"]:checked').value;
+            const ic_status = document.querySelector('input[name="payment_ic"]:checked').value;
+
+            // 日本語 + 選択言語
+            const displayLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')];
+
+            cardBodyHtml = displayLangs.map(lang => {
+                // 'jp' には content がないので、 'en' のデータから流用するか、専用のデータ構造にする
+                // 'jp' には options_text もない
+                if (lang === 'jp') {
+                     const texts = { yes: '○', no: '×', cash: '現金', card: 'クレジットカード', qr: 'QRコード', ic: '交通系IC' };
+                     const optionsHtml = [
+                        `<li>${texts.cash}: ${texts[cash_status]}</li>`,
+                        `<li>${texts.card}: ${texts[card_status]}</li>`,
+                        `<li>${texts.qr}: ${texts[qr_status]}</li>`,
+                        `<li>${texts.ic}: ${texts[ic_status]}</li>`
+                    ].join('');
+                    return `<div class="mb-2 last:mb-0">
+                                <p class="font-semibold text-gray-800">会計方式</p>
+                                <p class="text-gray-600">以下の決済が可能です。</p>
+                                <ul class="list-disc pl-5 mt-2 text-gray-600">${optionsHtml}</ul>
+                            </div>`;
+                }
+
+                const content = data.content[lang];
+                const texts = data.options_text[lang];
+                if (!content || !texts) return '';
+                
+                const optionsHtml = [
+                    `<li>${texts.cash}: ${texts[cash_status]}</li>`,
+                    `<li>${texts.card}: ${texts[card_status]}</li>`,
+                    `<li>${texts.qr}: ${texts[qr_status]}</li>`,
+                    `<li>${texts.ic}: ${texts[ic_status]}</li>`
+                ].join('');
+
+                return `<div class="mb-2 last:mb-0">
+                            <p class="font-semibold text-gray-800">${content.title}</p>
+                            <p class="text-gray-600">${content.description}</p>
+                            <ul class="list-disc pl-5 mt-2 text-gray-600">${optionsHtml}</ul>
+                        </div>`;
+            }).join('');
+        
+        } else { // 通常のカード処理
+            // 日本語 + 選択言語
+            const displayLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')];
+            cardBodyHtml = displayLangs.map(lang => {
+                // 'jp' の場合は jp_label をタイトルとして使う
+                if (lang === 'jp') {
+                    let jp_desc = data.jp_label.replace(/<[^>]*>/g, ''); // タグを除去
+                     if (data.hasInput) {
+                        const timeValue = document.getElementById(`${key}-input`).value || '?';
+                        jp_desc = jp_desc.replace('●', timeValue);
+                    }
+                    return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${jp_desc}</p></div>`;
+                }
+
+                const content = data.content[lang];
+                if (!content) return '';
+                let description = content.description;
+                if (data.hasInput) {
+                    const timeValue = document.getElementById(`${key}-input`).value || '?';
+                    description = description.replace('{time}', timeValue);
+                }
+                return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${content.title}</p><p class="text-gray-600">${description}</p></div>`;
+            }).join('');
+        }
+
         return `
             <div class="card-item">
-                <div class="card-header"><h5 class="card-header-title">${data.jp_label.replace(/<[^>]*>/g, '')}</h5></div>
-                <div class="card-body">${cardBodyHtml}</div>
-            </div>`;
+                <div class_A="card-body">${cardBodyHtml}</div>
+            </div>`; // [変更] ヘッダーを削除し、card-bodyのみに
     }).join('');
+
+    cardGrid.innerHTML += cardHtml;
     
     updatePaginationControls();
 }
 
+// --- [変更] ページネーション更新関数 ---
 function updatePaginationControls() {
-    const totalItems = getCheckedItemKeys().length;
-    const totalPages = Math.ceil(totalItems / CARDS_PER_PAGE);
-
+    const totalPages = getTotalPages();
     const paginationControls = document.getElementById('pagination-controls');
+    
     if (totalPages <= 1) {
         paginationControls.classList.add('hidden');
         return;
@@ -385,30 +593,87 @@ function updatePaginationControls() {
     document.getElementById('next-page').disabled = currentPage === totalPages;
 }
 
-function renderPreviewForPDF(itemKeys) {
-    const selectedLangs = getSelectedLangs();
-    const cardGrid = document.getElementById('card-grid');
-    cardGrid.innerHTML = itemKeys.map(key => {
-        const data = findItemByKey(key);
-        if (!data) return '';
-        const cardBodyHtml = selectedLangs.map(lang => {
-            let content = data.content[lang];
-            if (!content) return '';
-            let description = content.description;
-            if (data.hasInput) {
-                const timeValue = document.getElementById('seat_time_limit-input').value || '2';
-                description = description.replace('{time}', timeValue);
-            }
-            return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${content.title}</p><p class="text-gray-600">${description}</p></div>`;
-        }).join('');
-        return `
-            <div class="card-item">
-                <div class="card-header"><h5 class="card-header-title">${data.jp_label.replace(/<[^>]*>/g, '')}</h5></div>
-                <div class="card-body">${cardBodyHtml}</div>
-            </div>`;
-    }).join('');
+// --- [追加] 総ページ数を計算する関数 ---
+function getTotalPages() {
+    const totalItems = getCheckedItemKeys().length;
+    if (totalItems <= CARDS_PER_PAGE_PAGE1) {
+        return 1;
+    } else {
+        return 1 + Math.ceil((totalItems - CARDS_PER_PAGE_PAGE1) / CARDS_PER_PAGE_NORMAL);
+    }
 }
 
+// --- [変更] PDF生成関数 ---
+async function generatePDF() {
+    const loader = document.getElementById('loader');
+    loader.classList.remove('hidden');
+    
+    const { jsPDF } = window.jspdf;
+    // [変更] PDFは常に縦向き (p)
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    const totalPages = getTotalPages();
+    if (totalPages === 0) {
+        if(!document.getElementById('survey-modal').classList.contains('hidden')) {
+             loader.classList.add('hidden');
+        }
+        return;
+    };
+
+    const originalPage = currentPage;
+
+    try {
+        // [変更] ページネーションのロジックに合わせてループ
+        for (let i = 1; i <= totalPages; i++) {
+            currentPage = i;
+            renderPreview(); // 該当ページのプレビューを描画
+            
+            await new Promise(resolve => setTimeout(resolve, 100)); // 描画待ち
+
+            const canvas = await html2canvas(document.getElementById('preview-sheet'), {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null
+            });
+            
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+            
+            if (i > 1) pdf.addPage();
+            
+            pdf.addImage(imgData, 'JPEG', 0, 0, imgProps.width * ratio, imgProps.height * ratio);
+        }
+        
+        pdf.save('ishikawa_omotenashi_guide.pdf');
+
+    } catch(error) {
+        console.error("PDF generation failed:", error);
+        // [変更] alertは使わない
+        console.error("PDFの生成に失敗しました。");
+    } finally {
+        currentPage = originalPage;
+        renderPreview(); // プレビューを元に戻す
+        if(!document.getElementById('survey-modal').classList.contains('hidden')) {
+            loader.classList.add('hidden');
+        }
+    }
+}
+
+// --- 補助関数 ---
+function findItemByKey(key) {
+    for (const section of Object.values(phrasesData)) {
+        if (section.items[key]) { return section.items[key]; }
+    }
+    return null;
+}
+function getSelectedLangs() { return Array.from(document.querySelectorAll('.lang-checkbox:checked')).map(cb => cb.value); }
+function getCheckedItemKeys() { return Array.from(document.querySelectorAll('.checkbox-item:checked')).map(checkbox => checkbox.id); }
+
+// [変更] PDF用の描画関数は不要になった (renderPreviewをそのまま使うため)
 
 // --- 初期化実行 ---
 document.addEventListener('DOMContentLoaded', () => {
