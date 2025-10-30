@@ -15,7 +15,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { font-family: 'Inter', 'Noto Sans JP', sans-serif; }
-        /* [変更] プレビューはA4縦比率に固定 */
         #preview-sheet {
             background-color: white;
             background-image: url('./pattern_inbound.png');
@@ -25,9 +24,9 @@
             width: 100%;
             aspect-ratio: 210 / 297;
         }
-        #preview-header { padding: 0.75rem 1.5rem; border-bottom: 1px solid #e5e7eb; text-align: center; flex-shrink: 0; background-color: rgba(255,255,255,0.8); }
+        /* [変更] ヘッダー背景の不透明度を95%に */
+        #preview-header { padding: 0.75rem 1.5rem; border-bottom: 1px solid #e5e7eb; text-align: center; flex-shrink: 0; background-color: rgba(255,255,255,0.95); }
         #preview-header h2 { font-size: 1.1rem; font-weight: 700; color: #1f2937; }
-        /* [変更] グリッドは常に縦向き (2列) */
         #card-grid {
             flex-grow: 1;
             padding: 1rem;
@@ -35,26 +34,24 @@
             gap: 1rem;
             overflow: hidden;
             grid-template-columns: repeat(2, 1fr);
-            /* 行の高さは自動調整 */
             grid-auto-rows: 1fr;
         }
-        /* [追加] 1ページ目の協力依頼文用のスタイル */
         .welcome-message-card {
-            grid-column: span 2 / span 2; /* 2列分の幅を使用 */
-            grid-row: span 1 / span 1;   /* 1行分の高さを使用 */
+            grid-column: span 2 / span 2;
+            grid-row: span 1 / span 1;
             border: 1px solid #e5e7eb;
             border-radius: 0.5rem;
             padding: 1rem;
             background-color: rgba(255, 255, 255, 0.95);
         }
-        .welcome-message-card h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .welcome-message-card p { font-size: 0.75rem; line-height: 1.5; }
+        /* [変更] 協力依頼文のフォントサイズを調整 */
+        .welcome-message-card h3 { font-size: 1.0rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .welcome-message-card p { font-size: 0.8rem; line-height: 1.5; }
         
         #preview-footer { padding: 0.5rem 1.5rem; background-color: rgba(249, 250, 251, 0.9); color: #6b7280; font-size: 0.6rem; text-align: center; flex-shrink: 0; border-top: 1px solid #e5e7eb; }
         .card-item { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem; display: flex; flex-direction: column; overflow: hidden; background-color: rgba(255,255,255,0.95); }
-        .card-header { display: flex; align-items: center; padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #f3f4f6; flex-shrink: 0; }
-        .card-header-title { font-size: 0.8rem; font-weight: 600; }
-        .card-body { flex-grow: 1; overflow: hidden; font-size: 0.7rem; line-height: 1.4; }
+        /* [変更] 通常カードのフォントサイズを調整 */
+        .card-body { flex-grow: 1; overflow: hidden; font-size: 0.8rem; line-height: 1.4; }
         .card-body ul { list-style: disc; padding-left: 1rem; margin-top: 0.5rem; }
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
         #loader.hidden { display: none; }
@@ -63,7 +60,6 @@
         .pagination-button:disabled { opacity: 0.5; cursor: not-allowed; }
         .time-input { width: 4rem; text-align: center; border-radius: 0.25rem; border: 1px solid #d1d5db; padding: 0.25rem; margin: 0 0.25rem; }
         .time-input:disabled { background-color: #f3f4f6; cursor: not-allowed; }
-        /* [追加] ラジオボタン用 */
         .radio-label { margin-left: 0.5rem; font-weight: normal; }
         .radio-group { display: flex; gap: 1rem; }
     </style>
@@ -107,7 +103,6 @@
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <aside id="control-panel" class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
-                <!-- [変更] 言語選択から韓国語を削除 -->
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">表示言語 (複数選択可)</label>
                     <div id="language-selection" class="space-y-2">
@@ -115,16 +110,13 @@
                         <div><input id="lang-zh" value="zh" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-checkbox"><label for="lang-zh" class="ml-2 text-sm text-gray-800">中文 (中国語)</label></div>
                     </div>
                 </div>
-                <!-- [変更] レイアウト選択を削除 -->
                 <div id="checklist-sections"></div>
             </aside>
 
             <div class="lg:col-span-2">
                  <div id="preview-sheet-wrapper">
-                    <!-- [変更] プレビューコンテナのクラスを縦向きに固定 -->
                     <div id="preview-sheet">
                         <header id="preview-header"><h2>お客様へのお知らせ / Information for our Guests</h2></header>
-                        <!-- [変更] グリッドのクラスを縦向きに固定 -->
                         <main id="card-grid"></main>
                         <footer id="preview-footer"><p>※掲載内容は変更になる場合がございます。ご不明な点はスタッフまでお尋ねください。/ The contents are subject to change. Please ask our staff if you have any questions.</p></footer>
                     </div>
@@ -143,9 +135,7 @@
     </div>
 
 <script>
-// --- [変更] データ定義 ---
-
-// 1ページ目に表示する協力依頼文
+// --- データ定義 ---
 const welcomeMessageData = {
     en: {
         title: 'Information for Our Guests before the Meal',
@@ -161,25 +151,24 @@ const welcomeMessageData = {
     }
 };
 
-// 項目データ
 const phrasesData = {
     payment: {
         title: '会計関連',
         items: {
-            // [追加] 会計のラジオボタン項目
             payment_options: {
                 jp_label: '会計は以下に対応しています。',
-                hasCustomUI: true, // カスタムUI（ラジオボタン）を持つ
+                hasCustomUI: true,
                 content: {
                     en: { title: 'Payment Methods', description: 'We accept the following payment method(s). For details, please ask a member of our staff.'},
                     zh: { title: '結帳方式', description: '提供以下結帳方式。詳情請詢問店內人員。'}
                 },
+                // [変更] ラジオボタンのテキスト定義
                 options_text: {
                     en: { yes: 'Yes', no: 'No', cash: 'Cash', card: 'Credit Cards', qr: 'QR-Code Payment', ic: 'Transit IC Cards' },
-                    zh: { yes: '○', no: '×', cash: '現金', card: '信用卡', qr: 'QR Code', ic: '交通IC卡' }
+                    zh: { yes: '可', no: '不可', cash: '現金', card: '信用卡', qr: 'QR Code', ic: '交通IC卡' },
+                    jp: { yes: '可', no: '不可', cash: '現金', card: 'クレジットカード', qr: 'QRコード', ic: '交通系IC' }
                 }
             },
-            // [変更] 項目キーを変更
             no_split_bill_new: {
                 jp_label: '会計はグループ単位でまとめていただきますよう、お願いします。',
                 content: {
@@ -320,7 +309,6 @@ const phrasesData = {
     }
 };
 
-// --- [変更] ページあたりのカード数定義 ---
 const CARDS_PER_PAGE_PAGE1 = 6;
 const CARDS_PER_PAGE_NORMAL = 8;
 let currentPage = 1;
@@ -329,49 +317,46 @@ let currentPage = 1;
 function createChecklist() {
     const container = document.getElementById('checklist-sections');
     container.innerHTML = Object.values(phrasesData).map(section => {
-        // [変更] 会計セクションのカスタムUI処理
         if (section.title === '会計関連') {
             return `
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">${section.title}</h3>
                     <div class="space-y-4">
-                        <!-- 1. 共通説明文のチェックボックス -->
                         <div class="relative flex items-start">
                             <div class="flex h-6 items-center"><input id="payment_options" name="payment_options" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 checkbox-item"></div>
                             <div class="ml-3 text-sm leading-6"><label for="payment_options" class="font-medium text-gray-900">${section.items.payment_options.jp_label}</label></div>
                         </div>
-                        <!-- 2. ○× ラジオボタン -->
+                        <!-- [変更] ラジオボタンのテキストを「可」「不可」に -->
                         <div class="pl-5 space-y-3">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">－現金</label>
                                 <div class="flex space-x-4 mt-1 radio-group">
-                                    <input id="payment_cash_yes" name="payment_cash" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_cash_yes" class="radio-label">○</label>
-                                    <input id="payment_cash_no" name="payment_cash" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_cash_no" class="radio-label">×</label>
+                                    <input id="payment_cash_yes" name="payment_cash" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_cash_yes" class="radio-label">可</label>
+                                    <input id="payment_cash_no" name="payment_cash" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_cash_no" class="radio-label">不可</label>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">－クレジットカード</label>
                                 <div class="flex space-x-4 mt-1 radio-group">
-                                    <input id="payment_card_yes" name="payment_card" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_card_yes" class="radio-label">○</label>
-                                    <input id="payment_card_no" name="payment_card" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_card_no" class="radio-label">×</label>
+                                    <input id="payment_card_yes" name="payment_card" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_card_yes" class="radio-label">可</label>
+                                    <input id="payment_card_no" name="payment_card" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_card_no" class="radio-label">不可</label>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">－QRコード</label>
                                 <div class="flex space-x-4 mt-1 radio-group">
-                                    <input id="payment_qr_yes" name="payment_qr" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_qr_yes" class="radio-label">○</label>
-                                    <input id="payment_qr_no" name="payment_qr" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_qr_no" class="radio-label">×</label>
+                                    <input id="payment_qr_yes" name="payment_qr" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_qr_yes" class="radio-label">可</label>
+                                    <input id="payment_qr_no" name="payment_qr" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_qr_no" class="radio-label">不可</label>
                                 </div>
                             </div>
                              <div>
                                 <label class="block text-sm font-medium text-gray-700">－交通系IC</label>
                                 <div class="flex space-x-4 mt-1 radio-group">
-                                    <input id="payment_ic_yes" name="payment_ic" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_ic_yes" class="radio-label">○</label>
-                                    <input id="payment_ic_no" name="payment_ic" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_ic_no" class="radio-label">×</label>
+                                    <input id="payment_ic_yes" name="payment_ic" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_ic_yes" class="radio-label">可</label>
+                                    <input id="payment_ic_no" name="payment_ic" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_ic_no" class="radio-label">不可</label>
                                 </div>
                             </div>
                         </div>
-                        <!-- 3. グループ会計のチェックボックス -->
                         <div class="relative flex items-start">
                             <div class="flex h-6 items-center"><input id="no_split_bill_new" name="no_split_bill_new" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 checkbox-item"></div>
                             <div class="ml-3 text-sm leading-6"><label for="no_split_bill_new" class="font-medium text-gray-900">${section.items.no_split_bill_new.jp_label}</label></div>
@@ -380,12 +365,8 @@ function createChecklist() {
                 </div>
             `;
         }
-
-        // 他セクションの通常処理
         const itemsHtml = Object.keys(section.items).map(key => {
-            // payment_options はカスタム処理したのでスキップ
             if (key === 'payment_options' || key === 'no_split_bill_new') return '';
-            
             const item = section.items[key];
             return `
                 <div class="relative flex items-start">
@@ -393,7 +374,6 @@ function createChecklist() {
                     <div class="ml-3 text-sm leading-6"><label for="${key}" class="font-medium text-gray-900">${item.jp_label}</label></div>
                 </div>`;
         }).join('');
-        
         return `
             <div class="mb-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">${section.title}</h3>
@@ -401,7 +381,6 @@ function createChecklist() {
             </div>`;
     }).join('');
     
-    // [変更] 2つの時間入力のイベントリスナーを設定
     const timeCheckbox1 = document.getElementById('seat_time_limit_fixed');
     const timeInput1 = document.getElementById('seat_time_limit_fixed-input');
     if(timeCheckbox1 && timeInput1) {
@@ -414,9 +393,8 @@ function createChecklist() {
     }
 }
 
-// --- [変更] イベントリスナー設定 ---
+// --- イベントリスナー設定 (変更なし) ---
 function setupEventListeners() {
-    // [変更] .radio-item もリスナー対象に追加
     const inputs = document.querySelectorAll('.lang-checkbox, .checkbox-item, .radio-item');
     inputs.forEach(el => {
         el.addEventListener('change', () => {
@@ -424,25 +402,17 @@ function setupEventListeners() {
             renderPreview();
         });
     });
-
-    // [変更] 2つの時間入力のリスナー
     const timeInputs = document.querySelectorAll('#seat_time_limit_fixed-input, #seat_time_limit_busy-input');
     timeInputs.forEach(input => {
         input.addEventListener('input', renderPreview);
     });
-
-    // PDFダウンロードボタン (変更なし)
     document.getElementById('pdf-download-button').addEventListener('click', () => {
         document.getElementById('survey-modal').classList.remove('hidden');
         generatePDF();
     });
-
-    // スキップボタン (変更なし)
     document.getElementById('skip-survey-button').addEventListener('click', () => {
         document.getElementById('survey-modal').classList.add('hidden');
     });
-
-    // [変更] ページネーションのロジック
     document.getElementById('prev-page').addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderPreview(); } });
     document.getElementById('next-page').addEventListener('click', () => {
         const totalPages = getTotalPages();
@@ -450,7 +420,7 @@ function setupEventListeners() {
     });
 }
 
-// --- [変更] プレビュー描画関数 ---
+// --- プレビュー描画関数 ---
 function renderPreview() {
     const allCheckedItemKeys = getCheckedItemKeys();
     const selectedLangs = getSelectedLangs();
@@ -465,7 +435,6 @@ function renderPreview() {
     document.getElementById('placeholder').style.display = 'none';
     document.getElementById('preview-sheet').style.display = 'flex';
 
-    // [変更] ページごとのアイテムリストを取得
     let itemsForThisPage;
     if (currentPage === 1) {
         itemsForThisPage = allCheckedItemKeys.slice(0, CARDS_PER_PAGE_PAGE1);
@@ -476,11 +445,10 @@ function renderPreview() {
     }
 
     const cardGrid = document.getElementById('card-grid');
-    cardGrid.innerHTML = ''; // 毎回クリア
+    cardGrid.innerHTML = ''; 
 
-    // [変更] 1ページ目のみ、協力依頼文を追加
     if (currentPage === 1) {
-        const welcomeLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')]; // 日本語を先頭に、選択言語を追加
+        const welcomeLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')];
         const welcomeHtml = welcomeLangs.map(lang => {
             const data = welcomeMessageData[lang];
             if (!data) return '';
@@ -489,44 +457,23 @@ function renderPreview() {
         cardGrid.innerHTML += `<div class="welcome-message-card">${welcomeHtml}</div>`;
     }
 
-    // [変更] カードの描画ロジック
     const cardHtml = itemsForThisPage.map(key => {
         const data = findItemByKey(key);
         if (!data) return '';
         
         let cardBodyHtml = '';
 
-        // [変更] payment_options の特別処理
         if (key === 'payment_options') {
             const cash_status = document.querySelector('input[name="payment_cash"]:checked').value;
             const card_status = document.querySelector('input[name="payment_card"]:checked').value;
             const qr_status = document.querySelector('input[name="payment_qr"]:checked').value;
             const ic_status = document.querySelector('input[name="payment_ic"]:checked').value;
 
-            // 日本語 + 選択言語
             const displayLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')];
 
             cardBodyHtml = displayLangs.map(lang => {
-                // 'jp' には content がないので、 'en' のデータから流用するか、専用のデータ構造にする
-                // 'jp' には options_text もない
-                if (lang === 'jp') {
-                     const texts = { yes: '○', no: '×', cash: '現金', card: 'クレジットカード', qr: 'QRコード', ic: '交通系IC' };
-                     const optionsHtml = [
-                        `<li>${texts.cash}: ${texts[cash_status]}</li>`,
-                        `<li>${texts.card}: ${texts[card_status]}</li>`,
-                        `<li>${texts.qr}: ${texts[qr_status]}</li>`,
-                        `<li>${texts.ic}: ${texts[ic_status]}</li>`
-                    ].join('');
-                    return `<div class="mb-2 last:mb-0">
-                                <p class="font-semibold text-gray-800">会計方式</p>
-                                <p class="text-gray-600">以下の決済が可能です。</p>
-                                <ul class="list-disc pl-5 mt-2 text-gray-600">${optionsHtml}</ul>
-                            </div>`;
-                }
-
-                const content = data.content[lang];
                 const texts = data.options_text[lang];
-                if (!content || !texts) return '';
+                if (!texts) return ''; // 'jp' にも texts を定義したのでこのチェックでOK
                 
                 const optionsHtml = [
                     `<li>${texts.cash}: ${texts[cash_status]}</li>`,
@@ -535,6 +482,16 @@ function renderPreview() {
                     `<li>${texts.ic}: ${texts[ic_status]}</li>`
                 ].join('');
 
+                // 'jp' は専用のタイトルと説明を使う
+                if (lang === 'jp') {
+                     return `<div class="mb-2 last:mb-0">
+                                <p class="font-semibold text-gray-800">会計方式</p>
+                                <p class="text-gray-600">以下の決済が可能です。</p>
+                                <ul class="list-disc pl-5 mt-2 text-gray-600">${optionsHtml}</ul>
+                            </div>`;
+                }
+
+                const content = data.content[lang];
                 return `<div class="mb-2 last:mb-0">
                             <p class="font-semibold text-gray-800">${content.title}</p>
                             <p class="text-gray-600">${content.description}</p>
@@ -543,19 +500,16 @@ function renderPreview() {
             }).join('');
         
         } else { // 通常のカード処理
-            // 日本語 + 選択言語
             const displayLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')];
             cardBodyHtml = displayLangs.map(lang => {
-                // 'jp' の場合は jp_label をタイトルとして使う
                 if (lang === 'jp') {
-                    let jp_desc = data.jp_label.replace(/<[^>]*>/g, ''); // タグを除去
+                    let jp_desc = data.jp_label.replace(/<[^>]*>/g, '');
                      if (data.hasInput) {
                         const timeValue = document.getElementById(`${key}-input`).value || '?';
                         jp_desc = jp_desc.replace('●', timeValue);
                     }
                     return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${jp_desc}</p></div>`;
                 }
-
                 const content = data.content[lang];
                 if (!content) return '';
                 let description = content.description;
@@ -569,20 +523,18 @@ function renderPreview() {
 
         return `
             <div class="card-item">
-                <div class_A="card-body">${cardBodyHtml}</div>
-            </div>`; // [変更] ヘッダーを削除し、card-bodyのみに
+                <div class="card-body">${cardBodyHtml}</div>
+            </div>`;
     }).join('');
 
     cardGrid.innerHTML += cardHtml;
-    
     updatePaginationControls();
 }
 
-// --- [変更] ページネーション更新関数 ---
+// --- ページネーション更新関数 (変更なし) ---
 function updatePaginationControls() {
     const totalPages = getTotalPages();
     const paginationControls = document.getElementById('pagination-controls');
-    
     if (totalPages <= 1) {
         paginationControls.classList.add('hidden');
         return;
@@ -593,7 +545,7 @@ function updatePaginationControls() {
     document.getElementById('next-page').disabled = currentPage === totalPages;
 }
 
-// --- [追加] 総ページ数を計算する関数 ---
+// --- 総ページ数計算関数 (変更なし) ---
 function getTotalPages() {
     const totalItems = getCheckedItemKeys().length;
     if (totalItems <= CARDS_PER_PAGE_PAGE1) {
@@ -603,13 +555,12 @@ function getTotalPages() {
     }
 }
 
-// --- [変更] PDF生成関数 ---
+// --- PDF生成関数 ---
 async function generatePDF() {
     const loader = document.getElementById('loader');
     loader.classList.remove('hidden');
     
     const { jsPDF } = window.jspdf;
-    // [変更] PDFは常に縦向き (p)
     const pdf = new jsPDF('p', 'mm', 'a4');
     
     const totalPages = getTotalPages();
@@ -623,12 +574,10 @@ async function generatePDF() {
     const originalPage = currentPage;
 
     try {
-        // [変更] ページネーションのロジックに合わせてループ
         for (let i = 1; i <= totalPages; i++) {
             currentPage = i;
-            renderPreview(); // 該当ページのプレビューを描画
-            
-            await new Promise(resolve => setTimeout(resolve, 100)); // 描画待ち
+            renderPreview();
+            await new Promise(resolve => setTimeout(resolve, 100));
 
             const canvas = await html2canvas(document.getElementById('preview-sheet'), {
                 scale: 2,
@@ -643,27 +592,30 @@ async function generatePDF() {
             const pdfHeight = pdf.internal.pageSize.getHeight();
             const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
             
+            // [変更] X座標を計算して中央に配置
+            const imgWidth = imgProps.width * ratio;
+            const x_offset = (pdfWidth - imgWidth) / 2;
+
             if (i > 1) pdf.addPage();
             
-            pdf.addImage(imgData, 'JPEG', 0, 0, imgProps.width * ratio, imgProps.height * ratio);
+            // [変更] X座標オフセットを指定し、ファイル名を変更
+            pdf.addImage(imgData, 'JPEG', x_offset, 0, imgWidth, imgProps.height * ratio);
         }
         
         pdf.save('ishikawa_omotenashi_guide.pdf');
 
     } catch(error) {
         console.error("PDF generation failed:", error);
-        // [変更] alertは使わない
-        console.error("PDFの生成に失敗しました。");
     } finally {
         currentPage = originalPage;
-        renderPreview(); // プレビューを元に戻す
+        renderPreview();
         if(!document.getElementById('survey-modal').classList.contains('hidden')) {
             loader.classList.add('hidden');
         }
     }
 }
 
-// --- 補助関数 ---
+// --- 補助関数 (変更なし) ---
 function findItemByKey(key) {
     for (const section of Object.values(phrasesData)) {
         if (section.items[key]) { return section.items[key]; }
@@ -673,9 +625,7 @@ function findItemByKey(key) {
 function getSelectedLangs() { return Array.from(document.querySelectorAll('.lang-checkbox:checked')).map(cb => cb.value); }
 function getCheckedItemKeys() { return Array.from(document.querySelectorAll('.checkbox-item:checked')).map(checkbox => checkbox.id); }
 
-// [変更] PDF用の描画関数は不要になった (renderPreviewをそのまま使うため)
-
-// --- 初期化実行 ---
+// --- 初期化実行 (変更なし) ---
 document.addEventListener('DOMContentLoaded', () => {
     createChecklist();
     setupEventListeners();
