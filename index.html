@@ -667,7 +667,7 @@ async function generatePDF() {
             await new Promise(resolve => setTimeout(resolve, 100));
 
             const canvas = await html2canvas(document.getElementById('preview-sheet'), {
-                scale: 4, // [変更] 解像度を 2 から 4 に引き上げ
+                scale: 8, 
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: null
