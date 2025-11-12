@@ -12,8 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- (変更なし) スタイル -->
     <style>
+        /* (変更なし) body, #preview-sheet, #preview-header, #card-grid, .welcome-message-card, .payment-options-card, #preview-footer, .card-item, .card-body */
         body { font-family: 'Inter', 'Noto Sans JP', sans-serif; }
         #preview-sheet {
             background-color: white;
@@ -79,8 +79,9 @@
         }
         
         .card-pictogram {
-            width: 5rem; 
-            height: 5rem;
+            /* [変更] 5rem -> 4rem */
+            width: 4rem; 
+            height: 4rem;
             opacity: 1; 
             pointer-events: none;
             align-self: flex-end;
@@ -88,6 +89,7 @@
             flex-shrink: 0;
         }
         
+        /* (変更なし) #loader, .spinner, .pagination-button, .time-input, .radio-label, .radio-group */
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
         #loader.hidden { display: none; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin-bottom: 1rem; }
@@ -174,7 +176,7 @@
     </div>
 
 <script>
-// --- (変更なし) データ定義 ---
+// --- (変更なし) welcomeMessageData ---
 const welcomeMessageData = {
     en: {
         title: 'Information for Our Guests before the Meal',
@@ -190,6 +192,7 @@ const welcomeMessageData = {
     }
 };
 
+// --- [変更] phrasesData (中国語の「の」を「的」に修正) ---
 const phrasesData = {
     payment: {
         title: '会計関連',
@@ -226,7 +229,8 @@ const phrasesData = {
                 svgPath: './3.svg', 
                 content: {
                     en: { title: 'About "Otoshi" (Appetizer)', description: 'This restaurant serves o-toshi, a small appetizer included as part of the seating charge. This is a common custom at izakaya restaurants in Japan.'},
-                    zh: { title: '關於「開胃小菜」', description: '我們將提供「開胃小菜」作為座位費用。「開胃小菜」是讓您等待上菜時享用の料理，屬於日本居酒屋文化常見の習慣。'}
+                    // [修正] の -> 的 (2箇所)
+                    zh: { title: '關於「開胃小菜」', description: '我們將提供「開胃小菜」作為座位費用。「開胃小菜」是讓您等待上菜時享用的料理，屬於日本居酒屋文化常見的習慣。'}
                 }
             },
             table_charge_only: {
@@ -242,7 +246,8 @@ const phrasesData = {
                 svgPath: './5.svg', 
                 content: {
                     en: { title: 'About "Market Price"', description: 'Some of our menu items are “market price,” due to prices that can vary from day to day for items such as fresh seafood. Please ask for today’s price if you are interested.'},
-                    zh: { title: '關於「時價」', description: '部分商品採用「時價」計價。請向店內人員詢價。採用「時價」の商品，會隨著鮮魚等貨物の進貨成本而波動。'}
+                    // [修正] の -> 的 (2箇所)
+                    zh: { title: '關於「時價」', description: '部分商品採用「時價」計價。請向店內人員詢價。採用「時價」的商品，會隨著鮮魚等貨物的進貨成本而波動。'}
                 }
             },
             dietary_restrictions: {
@@ -250,7 +255,8 @@ const phrasesData = {
                 svgPath: './6.svg', 
                 content: {
                     en: { title: 'Dietary Restrictions', description: 'Please let us know if you have any food allergies, or dietary restrictions (religious or otherwise), and we will try to accommodate them as much as we can.'},
-                    zh: { title: '飲食限制', description: '因過敏、宗教、理念等原因而有飲食限制の客人，我們會在能力範圍內為您提供服務，請事先告知相關需求。'}
+                    // [修正] の -> 的
+                    zh: { title: '飲食限制', description: '因過敏、宗教、理念等原因而有飲食限制的客人，我們會在能力範圍內為您提供服務，請事先告知相關需求。'}
                 }
             },
             no_take_away_new: {
@@ -258,7 +264,8 @@ const phrasesData = {
                 svgPath: './7.svg', 
                 content: {
                     en: { title: 'No Take-out for Leftovers', description: 'We do not offer take-out for leftover food.'},
-                    zh: { title: '請勿打包剩菜', description: '請勿將吃剩の食物打包帶走。'}
+                    // [修正] の -> 的
+                    zh: { title: '請勿打包剩菜', description: '請勿將吃剩的食物打包帶走。'}
                 }
             },
             paid_water: {
@@ -329,7 +336,8 @@ const phrasesData = {
                 svgPath: './15.svg', 
                 content: {
                     en: { title: 'Seating Time Limit (Busy Hours)', description: 'When we are particularly busy, we ask that guests please stay no longer than {time} hours.'},
-                    zh: { title: '人數眾多時の用餐時間', description: '用餐人數眾多時將調整為{time}小時。'}
+                    // [修正] 時 -> 的
+                    zh: { title: '人數眾多時的用餐時間', description: '用餐人數眾多時將調整為{time}小時。'}
                 }
             }
         }
@@ -350,7 +358,8 @@ const phrasesData = {
                 svgPath: './17.svg', 
                 content: {
                     en: { title: 'Service Delays', description: 'Please note that, when we are particularly busy, it may take longer than usual to prepare your food, or for staff members to assist you.'},
-                    zh: { title: '關於等待時間', description: '用餐人數眾多時，店員の服務及料理の提供可能需要稍加等候。'}
+                    // [修正] の -> 的 (2箇所)
+                    zh: { title: '關於等待時間', description: '用餐人數眾多時，店員的服務及料理的提供可能需要稍加等候。'}
                 }
             },
             call_staff_new: {
@@ -369,10 +378,10 @@ const CARDS_PER_PAGE_PAGE1 = 2;
 const CARDS_PER_PAGE_NORMAL = 8;
 let currentPage = 1;
 
-// --- (変更なし) ピクトグラムHTML生成関数 ---
+// --- (変更なし) 全てのJavaScript関数 (createPictogramHtml, createChecklist, setupEventListeners, renderPaymentCard, renderPreview, updatePaginationControls, getTotalPages, generatePDF, findItemByKey, getSelectedLangs, getCheckedItemKeys) ---
+
 function createPictogramHtml(svgPath) {
     if (!svgPath) {
-        // デフォルトのフォールバックアイコン
         return `
         <div class="card-pictogram">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full">
@@ -380,15 +389,12 @@ function createPictogramHtml(svgPath) {
             </svg>
         </div>`;
     }
-    // imgタグを使用して外部SVGファイルを参照
     return `
     <div class="card-pictogram">
         <img src="${svgPath}" alt="" class="w-full h-full object-contain" onerror="this.style.display='none'">
     </div>`;
 }
 
-
-// --- (変更なし) チェックリスト生成 ---
 function createChecklist() {
     const container = document.getElementById('checklist-sections');
     container.innerHTML = Object.values(phrasesData).map(section => {
@@ -467,7 +473,6 @@ function createChecklist() {
     }
 }
 
-// --- (変更なし) イベントリスナー設定 ---
 function setupEventListeners() {
     const inputs = document.querySelectorAll('.lang-checkbox, .checkbox-item, .radio-item');
     inputs.forEach(el => {
@@ -494,7 +499,6 @@ function setupEventListeners() {
     });
 }
 
-// --- (変更なし) 支払いカード描画関数 ---
 function renderPaymentCard() {
     const data = phrasesData.payment.items.payment_options;
     const selectedLangs = getSelectedLangs();
@@ -542,7 +546,6 @@ function renderPaymentCard() {
         </div>`;
 }
 
-// --- (変更なし) プレビュー描画関数 ---
 function renderPreview() {
     const allStandardCardKeys = getCheckedItemKeys(); 
     const selectedLangs = getSelectedLangs();
@@ -624,7 +627,6 @@ function renderPreview() {
     updatePaginationControls();
 }
 
-// --- (変更なし) ページネーション更新 ---
 function updatePaginationControls() {
     const totalPages = getTotalPages();
     const paginationControls = document.getElementById('pagination-controls');
@@ -638,7 +640,6 @@ function updatePaginationControls() {
     document.getElementById('next-page').disabled = currentPage === totalPages;
 }
 
-// --- (変更なし) 総ページ数計算 ---
 function getTotalPages() {
     const totalItems = getCheckedItemKeys().length; 
     if (totalItems <= CARDS_PER_PAGE_PAGE1) {
@@ -648,13 +649,12 @@ function getTotalPages() {
     }
 }
 
-// --- [変更] PDF生成 ---
 async function generatePDF() {
     const loader = document.getElementById('loader');
     loader.classList.remove('hidden');
     
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4'); // A4 (210mm x 297mm)
+    const pdf = new jsPDF('p', 'mm', 'a4'); 
     
     const totalPages = getTotalPages();
     const isPaymentChecked = document.getElementById('payment_options').checked;
@@ -682,13 +682,11 @@ async function generatePDF() {
             });
             
             const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            const pdfWidth = pdf.internal.pageSize.getWidth(); // A4幅 (210mm)
-            const pdfHeight = pdf.internal.pageSize.getHeight(); // A4高さ (297mm)
+            const pdfWidth = pdf.internal.pageSize.getWidth(); 
+            const pdfHeight = pdf.internal.pageSize.getHeight(); 
             
             if (i > 1) pdf.addPage();
             
-            // [変更] 縦横比を維持するロジック(ratio, x_offset等)を削除
-            // [変更] 画像をPDFのA4ページいっぱいに強制的に描画 (x:0, y:0, width:pdfWidth, height:pdfHeight)
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         }
         
@@ -705,7 +703,6 @@ async function generatePDF() {
     }
 }
 
-// --- (変更なし) 補助関数 ---
 function findItemByKey(key) {
     for (const section of Object.values(phrasesData)) {
         if (section.items[key]) { return section.items[key]; }
