@@ -24,8 +24,9 @@
             width: 100%;
             aspect-ratio: 210 / 297;
         }
+        /* [変更] フォントサイズ 1.1rem -> 1.2rem */
         #preview-header { padding: 0.75rem 1.5rem; border-bottom: 1px solid #e5e7eb; text-align: center; flex-shrink: 0; background-color: rgba(255,255,255,0.95); }
-        #preview-header h2 { font-size: 1.1rem; font-weight: 700; color: #1f2937; }
+        #preview-header h2 { font-size: 1.2rem; font-weight: 700; color: #1f2937; }
         
         #card-grid {
             flex-grow: 1;
@@ -45,8 +46,10 @@
             padding: 1rem;
             background-color: rgba(255, 255, 255, 0.95);
         }
-        .welcome-message-card h3 { font-size: 1.0rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .welcome-message-card p { font-size: 0.8rem; line-height: 1.5; }
+        /* [変更] フォントサイズ 1.0rem -> 1.1rem */
+        .welcome-message-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        /* [変更] フォントサイズ 0.8rem -> 0.9rem */
+        .welcome-message-card p { font-size: 0.9rem; line-height: 1.5; }
         
         .payment-options-card {
             grid-column: span 2 / span 2;
@@ -58,7 +61,8 @@
             position: relative;
         }
         
-        #preview-footer { padding: 0.5rem 1.5rem; background-color: rgba(249, 250, 251, 0.9); color: #6b7280; font-size: 0.6rem; text-align: center; flex-shrink: 0; border-top: 1px solid #e5e7eb; }
+        /* [変更] フォントサイズ 0.6rem -> 0.7rem */
+        #preview-footer { padding: 0.5rem 1.5rem; background-color: rgba(249, 250, 251, 0.9); color: #6b7280; font-size: 0.7rem; text-align: center; flex-shrink: 0; border-top: 1px solid #e5e7eb; }
         
         .card-item { 
             border: 1px solid #e5e7eb; 
@@ -70,7 +74,8 @@
             position: relative;
         }
         
-        .card-body { flex-grow: 1; font-size: 0.8rem; line-height: 1.4; }
+        /* [変更] フォントサイズ 0.8rem -> 0.9rem */
+        .card-body { flex-grow: 1; font-size: 0.9rem; line-height: 1.4; }
         
         .card-pictogram {
             position: absolute;
@@ -78,8 +83,8 @@
             right: 0.5rem;
             width: 2.5rem; 
             height: 2.5rem;
-            opacity: 0.1; 
-            /* color: #000; <- <img> タグには効果がないため削除 */
+            /* [変更] opacity: 0.1 -> 1 */
+            opacity: 1; 
             pointer-events: none;
         }
         
@@ -168,7 +173,7 @@
     </div>
 
 <script>
-// --- データ定義 (変更) ---
+// --- データ定義 (変更なし) ---
 const welcomeMessageData = {
     en: {
         title: 'Information for Our Guests before the Meal',
@@ -190,7 +195,7 @@ const phrasesData = {
         items: {
             payment_options: {
                 jp_label: '会計は以下に対応しています。',
-                svgPath: './1.svg', // [変更] SVGパス追加
+                svgPath: './1.svg', 
                 hasCustomUI: true,
                 content: {
                     en: { title: 'Payment Methods', description: 'We accept the following payment method(s). For details, please ask a member of our staff.'},
@@ -204,7 +209,7 @@ const phrasesData = {
             },
             no_split_bill_new: {
                 jp_label: '会計はグループ単位でまとめていただきますよう、お願いします。',
-                svgPath: './2.svg', // [変更] SVGパス追加
+                svgPath: './2.svg', 
                 content: {
                     en: { title: 'Single Payment', description: 'We ask that you please pay for the entire party together in a single payment.'},
                     zh: { title: '統一結帳', description: '請以團體為單位結帳。'}
@@ -217,15 +222,15 @@ const phrasesData = {
         items: {
             otoshi_charge: {
                 jp_label: 'お席料として"お通し"をお出しします。',
-                svgPath: './3.svg', // [変更] SVGパス追加
+                svgPath: './3.svg', 
                 content: {
                     en: { title: 'About "Otoshi" (Appetizer)', description: 'This restaurant serves o-toshi, a small appetizer included as part of the seating charge. This is a common custom at izakaya restaurants in Japan.'},
-                    zh: { title: '關於「開胃小菜」', description: '我們將提供「開胃小菜」作為座位費用。「開胃小菜」是讓您等待上菜時享用的料理，屬於日本居酒屋文化常見の習慣。'}
+                    zh: { title: '關於「開胃小菜」', description: '我們將提供「開胃小菜」作為座位費用。「開胃小菜」是讓您等待上菜時享用の料理，屬於日本居酒屋文化常見の習慣。'}
                 }
             },
             table_charge_only: {
                 jp_label: 'お席料（テーブルチャージ）を頂戴しております。',
-                svgPath: './4.svg', // [変更] SVGパス追加
+                svgPath: './4.svg', 
                 content: {
                     en: { title: 'Seating Charge', description: 'We have a seating charge.'},
                     zh: { title: '座位費用', description: '會收取座位費用。'}
@@ -233,7 +238,7 @@ const phrasesData = {
             },
             market_price_new: {
                 jp_label: '一部商品は"時価"です。価格はお尋ねください。',
-                svgPath: './5.svg', // [変更] SVGパス追加
+                svgPath: './5.svg', 
                 content: {
                     en: { title: 'About "Market Price"', description: 'Some of our menu items are “market price,” due to prices that can vary from day to day for items such as fresh seafood. Please ask for today’s price if you are interested.'},
                     zh: { title: '關於「時價」', description: '部分商品採用「時價」計價。請向店內人員詢價。採用「時價」の商品，會隨著鮮魚等貨物の進貨成本而波動。'}
@@ -241,7 +246,7 @@ const phrasesData = {
             },
             dietary_restrictions: {
                 jp_label: 'アレルギーや宗教・思想などによる食事制限につきましては、可能な範囲で対応します。',
-                svgPath: './6.svg', // [変更] SVGパス追加
+                svgPath: './6.svg', 
                 content: {
                     en: { title: 'Dietary Restrictions', description: 'Please let us know if you have any food allergies, or dietary restrictions (religious or otherwise), and we will try to accommodate them as much as we can.'},
                     zh: { title: '飲食限制', description: '因過敏、宗教、理念等原因而有飲食限制の客人，我們會在能力範圍內為您提供服務，請事先告知相關需求。'}
@@ -249,7 +254,7 @@ const phrasesData = {
             },
             no_take_away_new: {
                 jp_label: '食べ残しのお持ち帰りはご遠慮ください。',
-                svgPath: './7.svg', // [変更] SVGパス追加
+                svgPath: './7.svg', 
                 content: {
                     en: { title: 'No Take-out for Leftovers', description: 'We do not offer take-out for leftover food.'},
                     zh: { title: '請勿打包剩菜', description: '請勿將吃剩の食物打包帶走。'}
@@ -257,7 +262,7 @@ const phrasesData = {
             },
             paid_water: {
                 jp_label: 'お水は有料でのご提供となります。',
-                svgPath: './8.svg', // [変更] SVGパス追加
+                svgPath: './8.svg', 
                 content: {
                     en: { title: 'Water', description: 'Water is available, but as a paid menu item.'},
                     zh: { title: '飲用水', description: '飲用水需付費。'}
@@ -265,7 +270,7 @@ const phrasesData = {
             },
             one_order_rule: {
                 jp_label: 'お一人様１品以上 ・1ドリンク以上のご注文をお願いします',
-                svgPath: './9.svg', // [変更] SVGパス追加
+                svgPath: './9.svg', 
                 content: {
                     en: { title: 'Minimum Order', description: 'We ask that you please order at least one menu item and at least one drink per person.'},
                     zh: { title: '最低消費', description: '每人需點1項餐點、1杯飲品'}
@@ -278,7 +283,7 @@ const phrasesData = {
         items: {
             ask_for_photos_new: {
                 jp_label: '店内撮影はプライバシーや雰囲気保持のため、事前にスタッフへご確認ください。',
-                svgPath: './10.svg', // [変更] SVGパス追加
+                svgPath: './10.svg', 
                 content: {
                     en: { title: 'Photography', description: 'To ensure a comfortable atmosphere and a shared sense of privacy, please ask the staff for permission before taking any photos while you are here.'},
                     zh: { title: '關於攝影', description: '為確保客人隱私及店內氛圍，如需在店內攝影請事先和店內工作人員確認。'}
@@ -286,7 +291,7 @@ const phrasesData = {
             },
             no_outside_food_new: {
                 jp_label: '飲食物の持ち込みはご遠慮いただいております。',
-                svgPath: './11.svg', // [変更] SVGパス追加
+                svgPath: './11.svg', 
                 content: {
                     en: { title: 'No Outside Food or Drinks', description: 'No outside food or drinks are allowed.'},
                     zh: { title: '禁止攜帶外食', description: '禁止攜帶外食外飲。'}
@@ -294,7 +299,7 @@ const phrasesData = {
             },
             smoking_area_new: {
                 jp_label: '喫煙は所定の場所にてお願いします。',
-                svgPath: './12.svg', // [変更] SVGパス追加
+                svgPath: './12.svg', 
                 content: {
                     en: { title: 'Smoking Area', description: 'Smoking is allowed only in designated locations.'},
                     zh: { title: '吸菸區', description: '請在指定場所抽菸。'}
@@ -302,7 +307,7 @@ const phrasesData = {
             },
             no_smoking_new: {
                 jp_label: '店内は全席禁煙となっております。',
-                svgPath: './13.svg', // [変更] SVGパス追加
+                svgPath: './13.svg', 
                 content: {
                     en: { title: 'Non-Smoking', description: 'All seats are non-smoking.'},
                     zh: { title: '全面禁菸', description: '店內全面禁菸。'}
@@ -311,7 +316,7 @@ const phrasesData = {
             seat_time_limit_fixed: {
                 hasInput: true,
                 jp_label: 'お席は<input type="number" id="seat_time_limit_fixed-input" class="time-input" value="2" min="0.5" step="0.5" disabled>時間制とさせていただいております。',
-                svgPath: './14.svg', // [変更] SVGパス追加
+                svgPath: './14.svg', 
                 content: {
                     en: { title: 'Seating Time Limit', description: 'We ask that guests please stay no longer than {time} hours.'},
                     zh: { title: '用餐時間', description: '用餐時間為{time}小時。'}
@@ -320,7 +325,7 @@ const phrasesData = {
             seat_time_limit_busy: {
                 hasInput: true,
                 jp_label: '混雑時は<input type="number" id="seat_time_limit_busy-input" class="time-input" value="2" min="0.5" step="0.5" disabled>時間制とさせていただく場合があります。',
-                svgPath: './15.svg', // [変更] SVGパス追加
+                svgPath: './15.svg', 
                 content: {
                     en: { title: 'Seating Time Limit (Busy Hours)', description: 'When we are particularly busy, we ask that guests please stay no longer than {time} hours.'},
                     zh: { title: '人數眾多時の用餐時間', description: '用餐人數眾多時將調整為{time}小時。'}
@@ -333,7 +338,7 @@ const phrasesData = {
         items: {
             language_barrier_new: {
                 jp_label: 'スタッフによる言語対応が難しい場合があります。ご了承ください。',
-                svgPath: './16.svg', // [変更] SVGパス追加
+                svgPath: './16.svg', 
                 content: {
                     en: { title: 'Language Support', description: 'Our staff may not be able to communicate in any language other than Japanese. We appreciate your understanding.'},
                     zh: { title: '語言溝通', description: '工作人員可能無法順利與您溝通。敬請見諒。'}
@@ -341,7 +346,7 @@ const phrasesData = {
             },
             service_delay_new: {
                 jp_label: '混雑時は、料理の提供やスタッフのご対応にお時間をいただく場合があります。',
-                svgPath: './17.svg', // [変更] SVGパス追加
+                svgPath: './17.svg', 
                 content: {
                     en: { title: 'Service Delays', description: 'Please note that, when we are particularly busy, it may take longer than usual to prepare your food, or for staff members to assist you.'},
                     zh: { title: '關於等待時間', description: '用餐人數眾多時，店員の服務及料理の提供可能需要稍加等候。'}
@@ -349,7 +354,7 @@ const phrasesData = {
             },
             call_staff_new: {
                 jp_label: 'ご用の際は直接または呼び鈴（ベル等）でお呼びください。',
-                svgPath: './18.svg', // [変更] SVGパス追加
+                svgPath: './18.svg', 
                 content: {
                     en: { title: 'Getting Staff\'s Attention', description: 'If you need anything, please let a staff member know directly, or use the bell at the table.'},
                     zh: { title: '呼叫店員', description: '如需協助請按下呼叫鈴或直接招呼店員。'}
@@ -363,19 +368,18 @@ const CARDS_PER_PAGE_PAGE1 = 2;
 const CARDS_PER_PAGE_NORMAL = 8;
 let currentPage = 1;
 
-// [変更] ピクトグラムHTML生成関数 (旧 samplePictogramSvg の代わり)
+// --- ピクトグラムHTML生成関数 (変更なし) ---
 function createPictogramHtml(svgPath) {
     if (!svgPath) {
-        // デフォルトのフォールバックアイコン (元のSVG)
+        // デフォルトのフォールバックアイコン
         return `
-        <div class="card-pictogram">
+        <div class="card-pictogram" style="opacity: 1;"> <!-- Ensure fallback also has opacity 1 if needed -->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full">
               <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
             </svg>
         </div>`;
     }
     // imgタグを使用して外部SVGファイルを参照
-    // onerrorを追加して、ファイルが存在しない場合に壊れた画像アイコンが表示されるのを防ぐ
     return `
     <div class="card-pictogram">
         <img src="${svgPath}" alt="" class="w-full h-full object-contain" onerror="this.style.display='none'">
@@ -489,7 +493,7 @@ function setupEventListeners() {
     });
 }
 
-// --- [変更] 支払いカード描画関数 ---
+// --- 支払いカード描画関数 (変更なし) ---
 function renderPaymentCard() {
     const data = phrasesData.payment.items.payment_options;
     const selectedLangs = getSelectedLangs();
@@ -505,7 +509,6 @@ function renderPaymentCard() {
         const texts = data.options_text[lang];
         if (!texts) return '';
         
-        // [変更なし] 箇条書き(ul)から横並び(flex)レイアウトに変更
         const optionsHtml = `
             <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-gray-600">
                 <span class="whitespace-nowrap">${texts.cash}: <strong class="font-medium text-gray-800">${texts[cash_status]}</strong></span>
@@ -531,7 +534,6 @@ function renderPaymentCard() {
                 </div>`;
     }).join('');
     
-    // [変更] samplePictogramSvg を createPictogramHtml(data.svgPath) に変更
     return `
         <div class="payment-options-card">
             <div class="card-body">${cardBodyHtml}</div>
@@ -539,7 +541,7 @@ function renderPaymentCard() {
         </div>`;
 }
 
-// --- [変更] プレビュー描画関数 ---
+// --- プレビュー描画関数 (変更なし) ---
 function renderPreview() {
     const allStandardCardKeys = getCheckedItemKeys(); 
     const selectedLangs = getSelectedLangs();
@@ -610,7 +612,6 @@ function renderPreview() {
             return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${content.title}</p><p class="text-gray-600">${description}</p></div>`;
         }).join('');
 
-        // [変更] samplePictogramSvg を createPictogramHtml(data.svgPath) に変更
         return `
             <div class="card-item">
                 <div class="card-body">${cardBodyHtml}</div>
