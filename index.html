@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <!-- (変更なし) メタデータ、リンク、スクリプト -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>石川県インバウンド対応店 注意書きジェネレーター</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- (変更なし) スタイル -->
     <style>
         body { font-family: 'Inter', 'Noto Sans JP', sans-serif; }
         #preview-sheet {
@@ -56,7 +56,6 @@
             padding: 0.75rem;
             background-color: rgba(255, 255, 255, 0.95);
             position: relative;
-            /* [変更] フレックスレイアウトを追加 */
             display: flex;
             flex-direction: column;
         }
@@ -74,23 +73,19 @@
         }
         
         .card-body {
-            /* [変更] flex-grow: 1 を設定し、テキストが上部スペースを埋めるように */
             flex-grow: 1;
             font-size: 0.9rem;
             line-height: 1.4;
         }
         
         .card-pictogram {
-            /* [変更] position: absolute を削除 */
-            /* [変更] width, height を 5rem (80px) に */
             width: 5rem; 
             height: 5rem;
             opacity: 1; 
             pointer-events: none;
-            /* [追加] レイアウト調整 */
-            align-self: flex-end; /* 右揃え */
-            margin-top: auto; /* テキストの下、カードの最下部に配置 */
-            flex-shrink: 0; /* SVGが縮まないように */
+            align-self: flex-end;
+            margin-top: auto;
+            flex-shrink: 0;
         }
         
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
@@ -106,7 +101,7 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- (変更なし) ローダー、モーダル、ヘッダー、メインコンテナ -->
+    <!-- (変更なし) HTMLボディ -->
     <div id="loader" class="hidden">
         <div class="spinner"></div>
         <p>PDFを生成中です...</p>
@@ -179,7 +174,7 @@
     </div>
 
 <script>
-// --- データ定義 (JavaScript部分は変更なし) ---
+// --- (変更なし) データ定義 ---
 const welcomeMessageData = {
     en: {
         title: 'Information for Our Guests before the Meal',
@@ -362,7 +357,7 @@ const phrasesData = {
                 jp_label: 'ご用の際は直接または呼び鈴（ベル等）でお呼びください。',
                 svgPath: './18.svg', 
                 content: {
-                    en: { title: 'Getting Staff\'s Attention', description: 'If you need anything, please let a staff member know directly, or use the bell at a table.'}, // 修正: a table
+                    en: { title: 'Getting Staff\'s Attention', description: 'If you need anything, please let a staff member know directly, or use the bell at a table.'},
                     zh: { title: '呼叫店員', description: '如需協助請按下呼叫鈴或直接招呼店員。'}
                 }
             }
@@ -374,7 +369,7 @@ const CARDS_PER_PAGE_PAGE1 = 2;
 const CARDS_PER_PAGE_NORMAL = 8;
 let currentPage = 1;
 
-// --- ピクトグラムHTML生成関数 (変更なし) ---
+// --- (変更なし) ピクトグラムHTML生成関数 ---
 function createPictogramHtml(svgPath) {
     if (!svgPath) {
         // デフォルトのフォールバックアイコン
@@ -393,7 +388,7 @@ function createPictogramHtml(svgPath) {
 }
 
 
-// --- チェックリスト生成 (変更なし) ---
+// --- (変更なし) チェックリスト生成 ---
 function createChecklist() {
     const container = document.getElementById('checklist-sections');
     container.innerHTML = Object.values(phrasesData).map(section => {
@@ -472,7 +467,7 @@ function createChecklist() {
     }
 }
 
-// --- イベントリスナー設定 (変更なし) ---
+// --- (変更なし) イベントリスナー設定 ---
 function setupEventListeners() {
     const inputs = document.querySelectorAll('.lang-checkbox, .checkbox-item, .radio-item');
     inputs.forEach(el => {
@@ -499,7 +494,7 @@ function setupEventListeners() {
     });
 }
 
-// --- 支払いカード描画関数 (変更なし) ---
+// --- (変更なし) 支払いカード描画関数 ---
 function renderPaymentCard() {
     const data = phrasesData.payment.items.payment_options;
     const selectedLangs = getSelectedLangs();
@@ -540,7 +535,6 @@ function renderPaymentCard() {
                 </div>`;
     }).join('');
     
-    // HTML構造は変更なし (CSSでレイアウトを制御)
     return `
         <div class="payment-options-card">
             <div class="card-body">${cardBodyHtml}</div>
@@ -548,7 +542,7 @@ function renderPaymentCard() {
         </div>`;
 }
 
-// --- プレビュー描画関数 (変更なし) ---
+// --- (変更なし) プレビュー描画関数 ---
 function renderPreview() {
     const allStandardCardKeys = getCheckedItemKeys(); 
     const selectedLangs = getSelectedLangs();
@@ -619,7 +613,6 @@ function renderPreview() {
             return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${content.title}</p><p class="text-gray-600">${description}</p></div>`;
         }).join('');
 
-    // HTML構造は変更なし (CSSでレイアウトを制御)
     return `
             <div class="card-item">
                 <div class="card-body">${cardBodyHtml}</div>
@@ -631,7 +624,7 @@ function renderPreview() {
     updatePaginationControls();
 }
 
-// --- ページネーション更新 (変更なし) ---
+// --- (変更なし) ページネーション更新 ---
 function updatePaginationControls() {
     const totalPages = getTotalPages();
     const paginationControls = document.getElementById('pagination-controls');
@@ -645,7 +638,7 @@ function updatePaginationControls() {
     document.getElementById('next-page').disabled = currentPage === totalPages;
 }
 
-// --- 総ページ数計算 (変更なし) ---
+// --- (変更なし) 総ページ数計算 ---
 function getTotalPages() {
     const totalItems = getCheckedItemKeys().length; 
     if (totalItems <= CARDS_PER_PAGE_PAGE1) {
@@ -655,13 +648,13 @@ function getTotalPages() {
     }
 }
 
-// --- PDF生成 (変更なし) ---
+// --- [変更] PDF生成 ---
 async function generatePDF() {
     const loader = document.getElementById('loader');
     loader.classList.remove('hidden');
     
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdf = new jsPDF('p', 'mm', 'a4'); // A4 (210mm x 297mm)
     
     const totalPages = getTotalPages();
     const isPaymentChecked = document.getElementById('payment_options').checked;
@@ -689,18 +682,14 @@ async function generatePDF() {
             });
             
             const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            
-            const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
-            const imgWidth = imgProps.width * ratio;
-            const imgHeight = imgProps.height * ratio;
-            const x_offset = (pdfWidth - imgWidth) / 2; 
+            const pdfWidth = pdf.internal.pageSize.getWidth(); // A4幅 (210mm)
+            const pdfHeight = pdf.internal.pageSize.getHeight(); // A4高さ (297mm)
             
             if (i > 1) pdf.addPage();
             
-            pdf.addImage(imgData, 'JPEG', x_offset, 0, imgWidth, imgHeight);
+            // [変更] 縦横比を維持するロジック(ratio, x_offset等)を削除
+            // [変更] 画像をPDFのA4ページいっぱいに強制的に描画 (x:0, y:0, width:pdfWidth, height:pdfHeight)
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         }
         
         pdf.save('ishikawa_omotenashi_guide.pdf');
@@ -716,7 +705,7 @@ async function generatePDF() {
     }
 }
 
-// --- 補助関数 (変更なし) ---
+// --- (変更なし) 補助関数 ---
 function findItemByKey(key) {
     for (const section of Object.values(phrasesData)) {
         if (section.items[key]) { return section.items[key]; }
@@ -730,7 +719,7 @@ function getCheckedItemKeys() {
             .filter(id => id !== 'payment_options');
 }
 
-// --- 初期化実行 (変更なし) ---
+// --- (変更なし) 初期化実行 ---
 document.addEventListener('DOMContentLoaded', () => {
     createChecklist();
     setupEventListeners();
