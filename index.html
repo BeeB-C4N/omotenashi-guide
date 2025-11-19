@@ -10,13 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.js"></script>
     
     <!-- スタイル -->
     <style>
         body { font-family: 'Inter', 'Noto Sans JP', sans-serif; }
         
-        /* 背景色の変更: 画像削除、単色#f4f3ecへ */
         #preview-sheet {
             background-color: #f4f3ec;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -26,7 +25,6 @@
             aspect-ratio: 210 / 297;
         }
 
-        /* ヘッダー背景色変更: #c5b37f */
         #preview-header { 
             padding: 0.75rem 1.5rem; 
             border-bottom: 1px solid #e5e7eb; 
@@ -69,7 +67,6 @@
             flex-direction: column;
         }
         
-        /* フッター背景色変更: #c5b37f, レイアウト調整 */
         #preview-footer { 
             padding: 0.75rem 1.5rem; 
             background-color: #c5b37f; 
@@ -85,17 +82,22 @@
             text-align: left;
             line-height: 1.3;
         }
-        #preview-footer .footer-logo {
+        /* フッターロゴのSVGコンテナ */
+        #preview-footer .footer-logo-svg {
             height: 2.5rem; /* ロゴの高さ調整 */
             margin-left: 1rem;
             object-fit: contain;
+            flex-shrink: 0;
+        }
+        #preview-footer .footer-logo-svg svg {
+            height: 100%;
+            width: auto;
         }
         
         .card-item { 
             border: 1px solid #e5e7eb; 
             border-radius: 0.5rem; 
             padding: 0.75rem; 
-            /* テキストとピクトグラムを重ねるため、親要素を相対配置にする */
             position: relative; 
             background-color: rgba(255,255,255,0.95);
             display: flex; 
@@ -103,7 +105,6 @@
         }
         
         .card-body {
-            /* テキストコンテンツは最前面に来るように設定 */
             position: relative;
             z-index: 10; 
             flex-grow: 1;
@@ -112,20 +113,23 @@
         }
         
         .card-pictogram {
-            position: absolute; /* 親要素を基準に絶対配置 */
-            z-index: 0; /* テキストの背面に配置 */
-            width: 70%; /* 大幅に拡大 */
-            height: 100%; /* カードの高さに合わせ、縦長カードで伸びるのを防ぐ */
-            bottom: 0; /* 右下に配置 */
-            right: 0; /* 右下に配置 */
-            opacity: 0.2; /* 透明度を調整（0.2 = 前回より濃い） */
+            position: absolute; 
+            z-index: 0; 
+            /* 縦横比を保ちつつ、カードに対して適切な大きさに調整 */
+            width: 40%; /* カード幅の40%程度に縮小 */
+            height: 80%; /* カード高さの80%程度に縮小 */
+            bottom: 10%; /* 中央より少し下、右側に配置 */
+            right: 5%; 
+            opacity: 0.2; 
             pointer-events: none;
         }
 
         .card-pictogram > img, .card-pictogram > svg {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* ★横伸びを防止：アスペクト比を維持してコンテナに収める★ */
+            object-fit: contain; 
+            /* ★修正点★: イラストの縦横比を1:1に固定 (多くの場合正方形アイコンのため) */
+            aspect-ratio: 1 / 1; 
         }
         
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
@@ -165,9 +169,7 @@
     <div class="container mx-auto p-4 md:p-8">
         <header class="mb-8 flex justify-between items-center flex-wrap gap-4">
             <div>
-                <!-- タイトル変更 -->
                 <h1 class="text-3xl font-bold text-gray-800">いしかわ・飲食店向け案内文かんたん作成ツール</h1>
-                <!-- サブタイトル変更 -->
                 <p class="text-gray-600 mt-2">外国人のお客様向けに、各店舗のルール・マナーを多言語で啓発できるご案内を簡単作成・PDF出力</p>
             </div>
             <div>
@@ -184,7 +186,6 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">表示言語 (複数選択可)</label>
                     <div id="language-selection" class="space-y-2">
                         <div><input id="lang-en" value="en" type="checkbox" checked class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-checkbox"><label for="lang-en" class="ml-2 text-sm text-gray-800">English (英語)</label></div>
-                        <!-- 中国語ラベル変更 -->
                         <div><input id="lang-zh" value="zh" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-checkbox"><label for="lang-zh" class="ml-2 text-sm text-gray-800">中文 (中国語／繁体字)</label></div>
                     </div>
                 </div>
@@ -204,7 +205,14 @@
                                 <p class="mt-1">※こちらのお願いは石川県国際観光課が提供するジェネレーターにより作成されました。<br>
                                 This notice was prepared using a generator provided by the Ishikawa Prefecture International Tourism Division.</p>
                             </div>
-                            <img src="./logo_ishikawatravel_ver2-3.svg" alt="Ishikawa Travel Logo" class="footer-logo" onerror="this.style.display='none'">
+                            <!-- ★修正点★: SVGをインライン化してPDF生成に対応 -->
+                            <div class="footer-logo-svg">
+                                <svg class="h-full w-auto" viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="0" y="0" width="100" height="30" fill="#ffffff" rx="5" ry="5"/>
+                                    <text x="50" y="20" font-family="'Inter', 'Noto Sans JP', sans-serif" font-size="10" fill="#c5b37f" text-anchor="middle" font-weight="bold">ISHIKAWA TRAVEL</text>
+                                    <circle cx="20" cy="15" r="5" fill="#c5b37f"/>
+                                </svg>
+                            </div>
                         </footer>
                     </div>
                     <div id="placeholder" class="text-center text-gray-500 py-16 bg-white rounded-lg shadow-md">選択した項目がここにプレビューされます。</div>
@@ -226,7 +234,7 @@
     </div>
 
 <script>
-// --- (変更なし) データ定義 ---
+// --- データ定義 (変更なし) ---
 const welcomeMessageData = {
     en: {
         title: 'Information for Our Guests before the Meal',
@@ -417,12 +425,11 @@ const phrasesData = {
     }
 };
 
-// --- [変更] 1ページ目のカード数を2から4に変更 (標準カード2枚分追加) ---
 const CARDS_PER_PAGE_PAGE1 = 4; 
 const CARDS_PER_PAGE_NORMAL = 8;
 let currentPage = 1;
 
-// --- (変更なし) 全てのJavaScript関数 ---
+// --- JavaScript関数 (一部修正あり) ---
 
 function createPictogramHtml(svgPath) {
     if (!svgPath) {
@@ -433,9 +440,10 @@ function createPictogramHtml(svgPath) {
             </svg>
         </div>`;
     }
+    // ★修正点★: object-fit: containをサポートするために、imgタグを使用しつつ、CSSでaspect-ratioを設定
     return `
     <div class="card-pictogram">
-        <img src="${svgPath}" alt="" class="w-full h-full object-contain" onerror="this.style.display='none'">
+        <img src="${svgPath}" alt="" class="w-full h-full" onerror="this.style.display='none'">
     </div>`;
 }
 
@@ -647,10 +655,7 @@ function renderPreview() {
                  if (key === 'seat_time_limit_fixed' || key === 'seat_time_limit_busy') { // hasInputはこれら2つだけ
                      const timeValue = document.getElementById(`${key}-input`).value || '?';
                      // 日本語ラベル内の input タグを直接処理していたため、ここではプレビュー用に値のみを埋め込む
-                     jp_desc = `お席は${timeValue}時間制とさせていただいております。`;
-                     if (key === 'seat_time_limit_busy') {
-                         jp_desc = `混雑時は${timeValue}時間制とさせていただく場合があります。`;
-                     }
+                     jp_desc = jp_desc.replace(/(\d*\.?\d*時間)/, `${timeValue}時間`);
                  }
                  return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${jp_desc}</p></div>`;
             }
@@ -690,10 +695,27 @@ function updatePaginationControls() {
 
 function getTotalPages() {
     const totalItems = getCheckedItemKeys().length; 
-    if (totalItems <= CARDS_PER_PAGE_PAGE1) {
+    const isWelcomeCard = true; // ウェルカムメッセージは必ずある
+    const isPaymentCard = document.getElementById('payment_options').checked;
+    let itemsOnPage1 = CARDS_PER_PAGE_PAGE1;
+
+    // Page 1: Welcome (1枠) + Payment (1枠) + Standard Cards (2枠) = 4枠
+    if (isPaymentCard) {
+        // Payment Card は Welcome Card と合わせて常に2枠分を占める (グリッドの全幅)
+        itemsOnPage1 = CARDS_PER_PAGE_PAGE1; 
+    } else {
+        // Payment Card がない場合、Page 1には Standard Cards が4枠入る
+        itemsOnPage1 = CARDS_PER_PAGE_PAGE1;
+    }
+    
+    // Page 1に配置される標準カードの数
+    const standardCardsOnPage1 = isPaymentCard ? 2 : 4; 
+
+    if (totalItems <= standardCardsOnPage1) {
         return 1;
     } else {
-        return 1 + Math.ceil((totalItems - CARDS_PER_PAGE_PAGE1) / CARDS_PER_PAGE_NORMAL);
+        const remainingItems = totalItems - standardCardsOnPage1;
+        return 1 + Math.ceil(remainingItems / CARDS_PER_PAGE_NORMAL);
     }
 }
 
@@ -706,15 +728,6 @@ async function generatePDF() {
     const pdf = new jsPDF('p', 'mm', 'a4'); 
     
     const totalPages = getTotalPages();
-    const isPaymentChecked = document.getElementById('payment_options').checked;
-    
-    if (totalPages === 1 && getCheckedItemKeys().length === 0 && !isPaymentChecked) {
-          if(!document.getElementById('survey-modal').classList.contains('hidden')) {
-              loader.classList.add('hidden');
-          }
-        return;
-    }
-
     const originalPage = currentPage;
     const previewSheet = document.getElementById('preview-sheet');
 
@@ -723,7 +736,7 @@ async function generatePDF() {
             currentPage = i;
             renderPreview();
             // DOM更新を待つ
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 200));
 
             // ★高解像度キャプチャを維持 (scale: 10)★
             const scaleFactor = 10;
@@ -743,8 +756,6 @@ async function generatePDF() {
             if (i > 1) pdf.addPage();
             
             // PDFに画像を挿入する際、キャプチャしたキャンバスの縦横比をPDFページサイズに合わせる
-            const imgHeight = canvas.height * pdfWidth / canvas.width;
-            
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
 
         }
@@ -765,7 +776,7 @@ async function generatePDF() {
     }
 }
 
-// --- (変更なし) 補助関数 ---
+// --- 補助関数 (変更なし) ---
 function findItemByKey(key) {
     for (const section of Object.values(phrasesData)) {
         if (section.items[key]) { return section.items[key]; }
@@ -779,7 +790,7 @@ function getCheckedItemKeys() {
             .filter(id => id !== 'payment_options');
 }
 
-// --- (変更なし) 初期化実行 ---
+// --- 初期化実行 (変更なし) ---
 document.addEventListener('DOMContentLoaded', () => {
     createChecklist();
     setupEventListeners();
