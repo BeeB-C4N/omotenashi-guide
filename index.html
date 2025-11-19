@@ -65,7 +65,8 @@
             border-radius: 0.5rem;
             padding: 0.75rem;
             background-color: rgba(255, 255, 255, 0.95);
-            position: relative;
+            /* ピクトグラムを背景にするため、位置の基準を相対配置にする */
+            position: relative; 
             display: flex;
             flex-direction: column;
         }
@@ -96,26 +97,39 @@
             border: 1px solid #e5e7eb; 
             border-radius: 0.5rem; 
             padding: 0.75rem; 
+            /* テキストとピクトグラムを重ねるため、親要素を相対配置にする */
+            position: relative; 
+            background-color: rgba(255,255,255,0.95);
+            /* flex-direction: column; はピクトグラムが絶対配置になるため不要だが、card-bodyのflex-grow: 1を考慮し残す */
             display: flex; 
             flex-direction: column; 
-            background-color: rgba(255,255,255,0.95);
-            position: relative;
         }
         
         .card-body {
+            /* テキストコンテンツは最前面に来るように設定 */
+            position: relative;
+            z-index: 10; 
             flex-grow: 1;
             font-size: 0.9rem;
             line-height: 1.4;
         }
         
         .card-pictogram {
-            width: 8rem; 
-            height: 8rem;
-            opacity: 1; 
-            pointer-events: none;
-            align-self: flex-end;
-            margin-top: auto;
-            flex-shrink: 0;
+            /* ★ ここから背景配置のための修正 ★ */
+            position: absolute; /* 親要素（.card-item, .payment-options-card）を基準に絶対配置 */
+            z-index: 0; /* テキストの背面に配置 */
+            width: 70%; /* 大幅に拡大 */
+            height: 70%; /* 大幅に拡大 */
+            bottom: 0; /* 右下に配置 */
+            right: 0; /* 右下に配置 */
+            opacity: 0.1; /* 不透明度を下げてウォーターマーク効果に */
+            pointer-events: none; /* クリックイベントを無効化し、下の要素に影響しないようにする */
+            /* 以前の flex/auto 関連のスタイルは absolute になるため上書きされるか、無効になる */
+        }
+        .card-pictogram > img, .card-pictogram > svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
@@ -415,6 +429,7 @@ let currentPage = 1;
 // --- (変更なし) 全てのJavaScript関数 ---
 
 function createPictogramHtml(svgPath) {
+    // SVG画像を絶対配置のコンテナでラップ
     if (!svgPath) {
         return `
         <div class="card-pictogram">
@@ -425,6 +440,7 @@ function createPictogramHtml(svgPath) {
     }
     return `
     <div class="card-pictogram">
+        <!-- SVG画像はW:100% H:100%でコンテナ全体に広がる -->
         <img src="${svgPath}" alt="" class="w-full h-full object-contain" onerror="this.style.display='none'">
     </div>`;
 }
@@ -575,7 +591,8 @@ function renderPaymentCard() {
     
     return `
         <div class="payment-options-card">
-            <div class="card-body">${cardBodyHtml}</div>
+            <!-- card-bodyにz-index:10を設定して、ピクトグラムより前面に来るようにする -->
+            <div class="card-body">${cardBodyHtml}</div> 
             ${createPictogramHtml(data.svgPath)}
         </div>`;
 }
@@ -634,9 +651,13 @@ function renderPreview() {
         cardBodyHtml = displayLangs.map(lang => {
             if (lang === 'jp') {
                 let jp_desc = data.jp_label.replace(/<[^>]*>/g, '');
-                 if (data.hasInput) {
+                 if (key === 'seat_time_limit_fixed' || key === 'seat_time_limit_busy') { // hasInputはこれら2つだけ
                      const timeValue = document.getElementById(`${key}-input`).value || '?';
-                     jp_desc = jp_desc.replace('●', timeValue);
+                     // 日本語ラベル内の input タグを直接処理していたため、ここではプレビュー用に値のみを埋め込む
+                     jp_desc = `お席は${timeValue}時間制とさせていただいております。`;
+                     if (key === 'seat_time_limit_busy') {
+                         jp_desc = `混雑時は${timeValue}時間制とさせていただく場合があります。`;
+                     }
                  }
                  return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${jp_desc}</p></div>`;
             }
@@ -695,9 +716,9 @@ async function generatePDF() {
     const isPaymentChecked = document.getElementById('payment_options').checked;
     
     if (totalPages === 1 && getCheckedItemKeys().length === 0 && !isPaymentChecked) {
-         if(!document.getElementById('survey-modal').classList.contains('hidden')) {
-             loader.classList.add('hidden');
-         }
+          if(!document.getElementById('survey-modal').classList.contains('hidden')) {
+              loader.classList.add('hidden');
+          }
         return;
     }
 
