@@ -95,34 +95,37 @@
             border: 1px solid #e5e7eb; 
             border-radius: 0.5rem; 
             padding: 0.75rem; 
+            /* テキストとピクトグラムを重ねるため、親要素を相対配置にする */
+            position: relative; 
+            background-color: rgba(255,255,255,0.95);
             display: flex; 
             flex-direction: column; 
-            background-color: rgba(255,255,255,0.95);
-            position: relative;
         }
         
         .card-body {
-            /* ★修正：z-indexとpositionの削除★ */
+            /* テキストコンテンツは最前面に来るように設定 */
+            position: relative;
+            z-index: 10; 
             flex-grow: 1;
             font-size: 0.9rem;
             line-height: 1.4;
         }
         
         .card-pictogram {
-            width: 10rem; 
-            height: 10rem;
-            opacity: 1; 
+            position: absolute; /* 親要素を基準に絶対配置 */
+            z-index: 0; /* テキストの背面に配置 */
+            width: 70%; /* 大幅に拡大 */
+            height: 100%; /* カードの高さに合わせ、縦長カードで伸びるのを防ぐ */
+            bottom: 0; /* 右下に配置 */
+            right: 0; /* 右下に配置 */
+            opacity: 0.2; /* 透明度を調整（0.2 = 前回より濃い） */
             pointer-events: none;
-            align-self: flex-end; 
-            margin-top: auto; 
-            flex-shrink: 0;
-            position: static; 
-            z-index: auto; 
         }
+
         .card-pictogram > img, .card-pictogram > svg {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: contain; /* ★横伸びを防止：アスペクト比を維持してコンテナに収める★ */
         }
         
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
@@ -713,33 +716,46 @@ async function generatePDF() {
     }
 
     const originalPage = currentPage;
+    const previewSheet = document.getElementById('preview-sheet');
 
     try {
         for (let i = 1; i <= totalPages; i++) {
             currentPage = i;
             renderPreview();
+            // DOM更新を待つ
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            const canvas = await html2canvas(document.getElementById('preview-sheet'), {
-                scale: 10, 
+            // ★高解像度キャプチャを維持 (scale: 10)★
+            const scaleFactor = 10;
+            const canvas = await html2canvas(previewSheet, {
+                scale: scaleFactor, 
                 useCORS: true,
                 allowTaint: true,
-                backgroundColor: null
+                backgroundColor: null,
+                width: previewSheet.offsetWidth,
+                height: previewSheet.offsetHeight,
             });
             
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const imgData = canvas.toDataURL('image/jpeg', 1.0); // 品質の維持のため、jpeg品質を1.0 (最高)に
             const pdfWidth = pdf.internal.pageSize.getWidth(); 
             const pdfHeight = pdf.internal.pageSize.getHeight(); 
             
             if (i > 1) pdf.addPage();
             
+            // PDFに画像を挿入する際、キャプチャしたキャンバスの縦横比をPDFページサイズに合わせる
+            const imgHeight = canvas.height * pdfWidth / canvas.width;
+            
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
         }
         
         pdf.save('ishikawa_omotenashi_guide.pdf');
 
     } catch(error) {
         console.error("PDF generation failed:", error);
+        // エラーが発生した場合もローダーを隠す
+        const errorMessage = "PDF生成中にエラーが発生しました。インターネット接続やブラウザの設定をご確認ください。";
+        console.log(errorMessage);
     } finally {
         currentPage = originalPage;
         renderPreview();
