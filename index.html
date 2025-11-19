@@ -109,16 +109,15 @@
         }
         
         .card-pictogram {
-            /* ★修正：元のレイアウトに戻す★ */
-            width: 8rem; 
-            height: 8rem;
-            opacity: 1; /* 不透明度を元に戻す */
+            width: 10rem; 
+            height: 10rem;
+            opacity: 1; 
             pointer-events: none;
-            align-self: flex-end; /* 右下に配置 (元のレイアウト) */
-            margin-top: auto; /* 上部コンテンツが固定され、画像が下に配置されるようにする */
+            align-self: flex-end; 
+            margin-top: auto; 
             flex-shrink: 0;
-            position: static; /* 絶対配置を解除し、通常フローに戻す */
-            z-index: auto; /* z-indexを解除 */
+            position: static; 
+            z-index: auto; 
         }
         .card-pictogram > img, .card-pictogram > svg {
             width: 100%;
