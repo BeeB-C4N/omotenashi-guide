@@ -87,7 +87,7 @@
         
         /* 修正: SVGコンテナの高さを2倍(5rem)に変更 */
         .footer-logo-container {
-            height: 5rem;
+            height: 4rem;
             margin-left: 1rem;
             flex-shrink: 0;
             display: flex;
@@ -95,7 +95,7 @@
         }
         
         .footer-logo-svg {
-            height: 100%;
+            height: 80%;
             width: auto;
             overflow: visible;
         }
@@ -206,7 +206,7 @@
                             <div class="footer-text">
                                 <p>※掲載内容は変更になる場合がございます。ご不明な点はスタッフまでお尋ねください。<br>
                                 Information may be subject to change. If you have any questions, please kindly ask our staff.</p>
-                                <p class="mt-1">※こちらのお願いは石川県国際観光課が提供するジェネレーターにより作成されました。<br>
+                                <p class="mt-1">※こちらのお願いは石川県国際観光課が提供する作成ツールにより作成されました。<br>
                                 This notice was prepared using a generator provided by the Ishikawa Prefecture International Tourism Division.</p>
                             </div>
                             
@@ -279,7 +279,7 @@ const phrasesData = {
             },
             no_split_bill_new: {
                 jp_label: '会計はグループ単位でまとめていただきますよう、お願いします。',
-                svgPath: './2.svg', 
+                svgPath: './3.svg', 
                 content: {
                     en: { title: 'Single Payment', description: 'We ask that you please pay for the entire party together in a single payment.'},
                     zh: { title: '統一結帳', description: '請以團體為單位結帳。'}
@@ -292,7 +292,7 @@ const phrasesData = {
         items: {
             otoshi_charge: {
                 jp_label: 'お席料として"お通し"をお出しします。"お通し"は料理提供までの間を繋ぐ、日本の居酒屋文化で一般的な慣習です。',
-                svgPath: './3.svg', 
+                svgPath: './2.svg', 
                 content: {
                     en: { title: 'About "Otoshi" (Appetizer)', description: 'This restaurant serves o-toshi, a small appetizer included as part of the seating charge. This is a common custom at izakaya restaurants in Japan.'},
                     zh: { title: '關於「開胃小菜」', description: '我們將提供「開胃小菜」作為座位費用。「開胃小菜」是讓您等待上菜時享用的料理，屬於日本居酒屋文化常見的習慣。'}
@@ -761,7 +761,7 @@ async function generatePDF() {
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         }
         
-        pdf.save('ishikawa_omotenashi_guide.pdf');
+        pdf.save('ishikawa_omotenashi_notice.pdf');
 
     } catch(error) {
         console.error("PDF generation failed:", error);
