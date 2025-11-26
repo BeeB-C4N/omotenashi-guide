@@ -44,16 +44,25 @@
             grid-auto-rows: min-content; 
         }
 
+        /* 修正: Welcome Messageのサイズ調整 */
         .welcome-message-card {
             grid-column: span 2 / span 2;
             grid-row: span 1 / span 1;
             border: 1px solid #e5e7eb;
             border-radius: 0.5rem;
-            padding: 1rem;
+            padding: 0.75rem; /* 余白を少し詰める */
             background-color: rgba(255, 255, 255, 0.95);
         }
-        .welcome-message-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .welcome-message-card p { font-size: 0.9rem; line-height: 1.5; }
+        /* 修正: フォントサイズと行間を詰めてスペースを確保 */
+        .welcome-message-card h3 { 
+            font-size: 1.0rem; /* 1.1rem -> 1.0rem */
+            font-weight: 700; 
+            margin-bottom: 0.25rem; 
+        }
+        .welcome-message-card p { 
+            font-size: 0.85rem; /* 0.9rem -> 0.85rem */
+            line-height: 1.4; /* 1.5 -> 1.4 */
+        }
         
         .payment-options-card {
             grid-column: span 2 / span 2;
@@ -67,6 +76,7 @@
             flex-direction: column;
         }
         
+        /* 修正: フッターの配置調整 */
         #preview-footer { 
             padding: 0.75rem 1.5rem; 
             background-color: #c5b37f; 
@@ -76,7 +86,7 @@
             border-top: 1px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center; /* flex-end -> center に変更して上下中央揃え */
         }
         #preview-footer .footer-text {
             text-align: left;
@@ -91,11 +101,10 @@
             align-items: center;
         }
         
-        /* 修正: SVGのアスペクト比をCSSでも強制 */
         .footer-logo-svg {
             height: 100%;
             width: auto;
-            aspect-ratio: 106.58 / 88.24; /* ViewBoxに基づく比率 */
+            aspect-ratio: 106.58 / 88.24;
             overflow: visible;
         }
         
@@ -209,7 +218,6 @@
                             
                             <!-- ロゴ表示エリア (SVG) -->
                             <div class="footer-logo-container">
-                                <!-- 修正: preserveAspectRatioを追加し、styleでアスペクト比を固定 -->
                                 <svg class="footer-logo-svg" 
                                      xmlns="http://www.w3.org/2000/svg" 
                                      xmlns:xlink="http://www.w3.org/1999/xlink" 
