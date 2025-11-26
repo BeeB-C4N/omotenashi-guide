@@ -749,10 +749,12 @@ async function generatePDF() {
             
             const imgData = canvas.toDataURL('image/jpeg', 0.95); 
             const pdfWidth = pdf.internal.pageSize.getWidth(); 
-            const pdfHeight = pdf.internal.pageSize.getHeight(); 
+            // 修正箇所: PDFの高さを固定ではなく、画像の比率に合わせて計算する
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
             
             if (i > 1) pdf.addPage();
             
+            // 修正箇所: 計算した高さ(pdfHeight)を使用
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         }
         
