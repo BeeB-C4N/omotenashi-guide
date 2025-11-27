@@ -247,9 +247,9 @@
     </div>
 
 <script>
-// 修正: ページごとの上限数を2つ減らす
+// 修正: ページごとの上限数
 const MAX_CELLS_PAGE1 = 6; 
-const MAX_CELLS_NORMAL = 12;
+const MAX_CELLS_NORMAL = 10; // 修正: 12 -> 10
 
 let currentPage = 1;
 
@@ -289,7 +289,7 @@ const phrasesData = {
             },
             no_split_bill_new: {
                 jp_label: '会計はグループ単位でまとめていただきますよう、お願いします。',
-                svgPath: './3.svg', // 修正: 2.svg -> 3.svg
+                svgPath: './3.svg', 
                 content: {
                     en: { title: 'Single Payment', description: 'We ask that you please pay for the entire party together in a single payment.'},
                     zh: { title: '統一結帳', description: '請以團體為單位結帳。'}
@@ -302,7 +302,7 @@ const phrasesData = {
         items: {
             otoshi_charge: {
                 jp_label: 'お席料として"お通し"をお出しします。"お通し"は料理提供までの間を繋ぐ、日本の居酒屋文化で一般的な慣習です。',
-                svgPath: './2.svg', // 修正: 3.svg -> 2.svg
+                svgPath: './2.svg', 
                 content: {
                     en: { title: 'About "Otoshi" (Appetizer)', description: 'This restaurant serves o-toshi, a small appetizer included as part of the seating charge. This is a common custom at izakaya restaurants in Japan.'},
                     zh: { title: '關於「開胃小菜」', description: '我們將提供「開胃小菜」作為座位費用。「開胃小菜」是讓您等待上菜時享用的料理，屬於日本居酒屋文化常見的習慣。'}
@@ -353,7 +353,6 @@ const phrasesData = {
                 svgPath: './9.svg', 
                 content: {
                     en: { title: 'Minimum Order', description: 'We ask that you please order at least one menu item per person.'},
-                    // 修正: 中国語訳を変更
                     zh: { title: '最低消費', description: '每位客人至少需點一份飲料或餐點。'}
                 }
             }
