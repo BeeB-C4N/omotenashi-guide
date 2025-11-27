@@ -21,22 +21,20 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
-            width: 100%;
-            /* A4比率を強制 */
+            width: 100%; /* 通常時は親要素に合わせる */
             aspect-ratio: 210 / 297;
-            /* PDF化の際のズレを防ぐため、基準となる幅に対する相対値を徹底する */
             position: relative;
+            /* PDF生成時のレイアウト崩れを防ぐため、ボックスサイズ計算を明確にする */
+            box-sizing: border-box;
         }
 
         #preview-header { 
-            /* 修正: ヘッダーの幅（高さ）を大きく */
             padding: 1.25rem 1.5rem; 
             border-bottom: 1px solid #e5e7eb; 
             text-align: center; 
             flex-shrink: 0; 
             background-color: #c5b37f; 
         }
-        /* 修正: タイトル文字サイズを大きく (1.0rem -> 1.3rem) */
         #preview-header h2 { 
             font-size: 1.3rem; 
             font-weight: 700; 
@@ -86,7 +84,6 @@
         }
         
         #preview-footer { 
-            /* 修正: フッター文字サイズを少し大きく調整 */
             padding: 0.75rem 1.5rem; 
             background-color: #c5b37f; 
             color: #ffffff; 
@@ -113,7 +110,6 @@
         .footer-logo-svg {
             height: 100%;
             width: auto;
-            /* SVG自体の比率を維持 */
             aspect-ratio: 106.58 / 88.24;
             overflow: visible;
         }
@@ -136,7 +132,6 @@
             line-height: 1.35;
         }
         
-        /* 修正: 画像表示エリアのCSSを変更 (Flexboxで中央配置し、imgタグ自体のサイズ制限で比率を維持する) */
         .card-pictogram {
             position: absolute; 
             z-index: 0; 
@@ -146,19 +141,17 @@
             right: 5%; 
             opacity: 0.2; 
             pointer-events: none;
-            /* Flexboxで中身を完全に中央揃えにする */
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* 修正: 画像が縦に伸びないように、width/height: auto を組み合わせる */
         .card-pictogram > img, .card-pictogram > svg {
             max-width: 100%;
             max-height: 100%;
             width: auto;
             height: auto;
-            object-fit: contain; /* 念のため残すが、上の設定でほぼ解決するはず */
+            object-fit: contain; 
         }
         
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
@@ -198,7 +191,6 @@
     <div class="container mx-auto p-4 md:p-8">
         <header class="mb-8 flex justify-between items-center flex-wrap gap-4">
             <div>
-                <!-- 修正: サイトタイトルを変更 -->
                 <h1 class="text-3xl font-bold text-gray-800">いしかわ飲食店向け　外国語案内文かんたん作成ツール</h1>
                 <p class="text-gray-600 mt-2">外国人のお客様向けに、各店舗のルール・マナーを多言語で啓発できるご案内を簡単作成・PDF出力</p>
             </div>
@@ -752,6 +744,10 @@ async function generatePDF() {
     const originalPage = currentPage;
     const previewSheet = document.getElementById('preview-sheet');
 
+    // 対策: 一時的に幅を固定して、ディスプレイの拡大率(DPIスケーリング)の影響を受けないようにする
+    const originalWidth = previewSheet.style.width;
+    previewSheet.style.width = '800px'; // A4縦横比を維持するための基準幅（高解像度で見える幅）
+
     try {
         for (let i = 1; i <= totalPages; i++) {
             currentPage = i;
@@ -772,19 +768,18 @@ async function generatePDF() {
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: null,
-                width: previewSheet.offsetWidth,
+                width: previewSheet.offsetWidth, // 固定した幅を使用
                 height: previewSheet.offsetHeight,
+                windowWidth: 800, // ウィンドウ幅も固定とみなしてレンダリングさせる
                 imageTimeout: 15000, 
             });
             
             const imgData = canvas.toDataURL('image/jpeg', 0.95); 
             const pdfWidth = pdf.internal.pageSize.getWidth(); 
-            // 修正箇所: PDFの高さを固定ではなく、画像の比率に合わせて計算する
             const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
             
             if (i > 1) pdf.addPage();
             
-            // 修正箇所: 計算した高さ(pdfHeight)を使用
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         }
         
@@ -794,6 +789,8 @@ async function generatePDF() {
         console.error("PDF generation failed:", error);
         alert("PDF生成エラー: 画像の読み込み等に失敗している可能性があります。");
     } finally {
+        // 元に戻す
+        previewSheet.style.width = originalWidth;
         currentPage = originalPage;
         renderPreview();
         if(!document.getElementById('survey-modal').classList.contains('hidden')) {
