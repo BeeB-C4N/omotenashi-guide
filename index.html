@@ -44,24 +44,23 @@
             grid-auto-rows: min-content; 
         }
 
-        /* 修正: Welcome Messageのサイズ調整 */
+        /* Welcome Messageのサイズ調整 */
         .welcome-message-card {
             grid-column: span 2 / span 2;
             grid-row: span 1 / span 1;
             border: 1px solid #e5e7eb;
             border-radius: 0.5rem;
-            padding: 0.75rem; /* 余白を少し詰める */
+            padding: 0.75rem;
             background-color: rgba(255, 255, 255, 0.95);
         }
-        /* 修正: フォントサイズと行間を詰めてスペースを確保 */
         .welcome-message-card h3 { 
-            font-size: 1.0rem; /* 1.1rem -> 1.0rem */
+            font-size: 1.0rem;
             font-weight: 700; 
             margin-bottom: 0.25rem; 
         }
         .welcome-message-card p { 
-            font-size: 0.85rem; /* 0.9rem -> 0.85rem */
-            line-height: 1.4; /* 1.5 -> 1.4 */
+            font-size: 0.85rem;
+            line-height: 1.4;
         }
         
         .payment-options-card {
@@ -76,7 +75,7 @@
             flex-direction: column;
         }
         
-        /* 修正: フッターの配置調整 */
+        /* フッターの配置調整 */
         #preview-footer { 
             padding: 0.75rem 1.5rem; 
             background-color: #c5b37f; 
@@ -86,7 +85,7 @@
             border-top: 1px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
-            align-items: center; /* flex-end -> center に変更して上下中央揃え */
+            align-items: center; /* 上下中央揃え */
         }
         #preview-footer .footer-text {
             text-align: left;
@@ -248,8 +247,9 @@
     </div>
 
 <script>
-const MAX_CELLS_PAGE1 = 8; 
-const MAX_CELLS_NORMAL = 14;
+// 修正: ページごとの上限数を2つ減らす
+const MAX_CELLS_PAGE1 = 6; 
+const MAX_CELLS_NORMAL = 12;
 
 let currentPage = 1;
 
@@ -289,7 +289,7 @@ const phrasesData = {
             },
             no_split_bill_new: {
                 jp_label: '会計はグループ単位でまとめていただきますよう、お願いします。',
-                svgPath: './2.svg', 
+                svgPath: './3.svg', // 修正: 2.svg -> 3.svg
                 content: {
                     en: { title: 'Single Payment', description: 'We ask that you please pay for the entire party together in a single payment.'},
                     zh: { title: '統一結帳', description: '請以團體為單位結帳。'}
@@ -302,7 +302,7 @@ const phrasesData = {
         items: {
             otoshi_charge: {
                 jp_label: 'お席料として"お通し"をお出しします。"お通し"は料理提供までの間を繋ぐ、日本の居酒屋文化で一般的な慣習です。',
-                svgPath: './3.svg', 
+                svgPath: './2.svg', // 修正: 3.svg -> 2.svg
                 content: {
                     en: { title: 'About "Otoshi" (Appetizer)', description: 'This restaurant serves o-toshi, a small appetizer included as part of the seating charge. This is a common custom at izakaya restaurants in Japan.'},
                     zh: { title: '關於「開胃小菜」', description: '我們將提供「開胃小菜」作為座位費用。「開胃小菜」是讓您等待上菜時享用的料理，屬於日本居酒屋文化常見的習慣。'}
@@ -353,7 +353,8 @@ const phrasesData = {
                 svgPath: './9.svg', 
                 content: {
                     en: { title: 'Minimum Order', description: 'We ask that you please order at least one menu item per person.'},
-                    zh: { title: '最低消費', description: '每位客人請至少點一項品項'}
+                    // 修正: 中国語訳を変更
+                    zh: { title: '最低消費', description: '每位客人至少需點一份飲料或餐點。'}
                 }
             }
         }
