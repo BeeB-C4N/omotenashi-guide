@@ -32,8 +32,7 @@
             flex-shrink: 0; 
             background-color: #c5b37f; 
         }
-        /* 修正: フォントサイズを縮小 1.2rem -> 1.0rem */
-        #preview-header h2 { font-size: 1.0rem; font-weight: 700; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        #preview-header h2 { font-size: 1.1rem; font-weight: 700; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         
         #card-grid {
             flex-grow: 1;
@@ -45,6 +44,7 @@
             grid-auto-rows: min-content; 
         }
 
+        /* Welcome Messageのサイズ調整 */
         .welcome-message-card {
             grid-column: span 2 / span 2;
             grid-row: span 1 / span 1;
@@ -53,16 +53,14 @@
             padding: 0.75rem;
             background-color: rgba(255, 255, 255, 0.95);
         }
-        /* 修正: フォントサイズを縮小 1.0rem -> 0.8rem */
         .welcome-message-card h3 { 
-            font-size: 0.8rem;
+            font-size: 0.9rem; /* 少し大きく戻す */
             font-weight: 700; 
             margin-bottom: 0.25rem; 
         }
-        /* 修正: フォントサイズを縮小 0.85rem -> 0.65rem */
         .welcome-message-card p { 
-            font-size: 0.65rem;
-            line-height: 1.4;
+            font-size: 0.8rem; /* カード本文に合わせる */
+            line-height: 1.35;
         }
         
         .payment-options-card {
@@ -77,17 +75,17 @@
             flex-direction: column;
         }
         
+        /* フッターの配置調整 */
         #preview-footer { 
             padding: 0.75rem 1.5rem; 
             background-color: #c5b37f; 
             color: #ffffff; 
-            /* 修正: フォントサイズを縮小 0.85rem -> 0.65rem */
-            font-size: 0.65rem; 
+            font-size: 0.7rem; /* 少し大きく */
             flex-shrink: 0; 
             border-top: 1px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: center; /* 上下中央揃え */
         }
         #preview-footer .footer-text {
             text-align: left;
@@ -123,9 +121,8 @@
             position: relative;
             z-index: 10; 
             flex-grow: 1;
-            /* 修正: フォントサイズを縮小 0.9rem -> 0.7rem */
-            font-size: 0.7rem;
-            line-height: 1.4;
+            font-size: 0.8rem; /* Welcome Messageと統一 */
+            line-height: 1.35;
         }
         
         .card-pictogram {
@@ -216,6 +213,10 @@
                             <div class="footer-text">
                                 <p>※掲載内容は変更になる場合がございます。ご不明な点はスタッフまでお尋ねください。<br>
                                 Information may be subject to change. If you have any questions, please kindly ask our staff.</p>
+                                <p class="mt-2 pt-2 border-t border-white/30">
+                                    この案内は、石川県が提供するサービスを使って作成されました。<br>
+                                    This information was created using services provided by Ishikawa Prefecture.
+                                </p>
                             </div>
                             
                             <!-- ロゴ表示エリア (SVG) -->
