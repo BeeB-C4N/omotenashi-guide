@@ -163,6 +163,24 @@
         .time-input:disabled { background-color: #f3f4f6; cursor: not-allowed; }
         .radio-label { margin-left: 0.5rem; font-weight: normal; }
         .radio-group { display: flex; gap: 1rem; }
+        
+        /* ブランド選択用のスタイル */
+        .brand-checkbox-container {
+            margin-top: 0.5rem;
+            margin-left: 0.5rem;
+            display: none; /* 初期状態は非表示 */
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .brand-checkbox-container.visible {
+            display: flex;
+        }
+        .brand-label {
+            font-size: 0.85rem;
+            color: #4b5563;
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -176,7 +194,6 @@
     <div id="survey-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl h-full max-h-[90vh] flex flex-col">
             <div class="p-4 border-b">
-                <!-- 修正: ポップアップの文言を変更 -->
                 <h3 class="text-lg font-medium text-gray-900">店舗情報の入力をお願いします</h3>
             </div>
             <div class="flex-grow p-1 relative">
@@ -192,12 +209,10 @@
     <div class="container mx-auto p-4 md:p-8">
         <header class="mb-8 flex justify-between items-center flex-wrap gap-4">
             <div>
-                <!-- 修正: タイトルを変更、副題を削除 -->
                 <h1 class="text-3xl font-bold text-gray-800">外国人向け飲食店利用案内作成ツール</h1>
                 <p class="text-gray-600 mt-2">外国人のお客様向けに、各店舗のルール・マナーを多言語で啓発できるご案内を簡単作成・PDF出力</p>
             </div>
             <div>
-                <!-- 修正: フィードバックのリンク先を変更 -->
                 <a href="https://forms.gle/TPwCgFaXNDMR729B9" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
                     <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" /></svg>
                     ツールのフィードバックをお寄せください
@@ -299,9 +314,9 @@ const phrasesData = {
                     zh: { title: '結帳方式', description: '提供以下結帳方式。詳情請詢問店內人員。'}
                 },
                 options_text: {
-                    en: { yes: 'Yes', no: 'No', cash: 'Cash', card: 'Credit Cards', qr: 'QR-Code Payment', ic: 'Transit IC Cards' },
-                    zh: { yes: '可', no: '不可', cash: '現金', card: '信用卡', qr: 'QR Code', ic: '交通IC卡' },
-                    jp: { yes: '可', no: '不可', cash: '現金', card: 'クレジットカード', qr: 'QRコード', ic: '交通系IC' }
+                    en: { yes: 'Yes', no: 'No', cash: 'Cash', card: 'Credit Cards', ic: 'Transit IC Cards' },
+                    zh: { yes: '可', no: '不可', cash: '現金', card: '信用卡', ic: '交通IC卡' },
+                    jp: { yes: '可', no: '不可', cash: '現金', card: 'クレジットカード', ic: '交通系IC' }
                 }
             },
             no_split_bill_new: {
@@ -502,12 +517,12 @@ function createChecklist() {
                                     <input id="payment_card_yes" name="payment_card" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_card_yes" class="radio-label">可</label>
                                     <input id="payment_card_no" name="payment_card" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_card_no" class="radio-label">不可</label>
                                 </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">－QRコード</label>
-                                <div class="flex space-x-4 mt-1 radio-group">
-                                    <input id="payment_qr_yes" name="payment_qr" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_qr_yes" class="radio-label">可</label>
-                                    <input id="payment_qr_no" name="payment_qr" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_qr_no" class="radio-label">不可</label>
+                                <!-- 修正: ブランド選択チェックボックス追加 -->
+                                <div id="card_brands_container" class="brand-checkbox-container">
+                                    <div class="brand-label"><input type="checkbox" id="brand_visa" value="VISA" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 brand-item mr-1"> VISA</div>
+                                    <div class="brand-label"><input type="checkbox" id="brand_master" value="Mastercard" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 brand-item mr-1"> Mastercard</div>
+                                    <div class="brand-label"><input type="checkbox" id="brand_amex" value="American Express" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 brand-item mr-1"> American Express</div>
+                                    <div class="brand-label"><input type="checkbox" id="brand_unionpay" value="UnionPay" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 brand-item mr-1"> UnionPay（銀聯）</div>
                                 </div>
                             </div>
                              <div>
@@ -559,9 +574,29 @@ function setupEventListeners() {
     inputs.forEach(el => {
         el.addEventListener('change', () => {
             currentPage = 1;
+            // 修正: クレジットカードのラジオボタン変更時にブランド表示制御
+            if(el.name === 'payment_card') {
+                const brandsContainer = document.getElementById('card_brands_container');
+                if (brandsContainer) {
+                    if (el.value === 'yes') {
+                        brandsContainer.classList.add('visible');
+                    } else {
+                        brandsContainer.classList.remove('visible');
+                    }
+                }
+            }
             renderPreview();
         });
     });
+    
+    // 修正: ブランドチェックボックスのイベントリスナー追加
+    const brandInputs = document.querySelectorAll('.brand-item');
+    brandInputs.forEach(el => {
+        el.addEventListener('change', () => {
+            renderPreview();
+        });
+    });
+
     const timeInputs = document.querySelectorAll('#seat_time_limit_fixed-input, #seat_time_limit_busy-input');
     timeInputs.forEach(input => {
         input.addEventListener('input', renderPreview);
@@ -586,8 +621,11 @@ function renderPaymentCard() {
     
     const cash_status = document.querySelector('input[name="payment_cash"]:checked').value;
     const card_status = document.querySelector('input[name="payment_card"]:checked').value;
-    const qr_status = document.querySelector('input[name="payment_qr"]:checked').value;
     const ic_status = document.querySelector('input[name="payment_ic"]:checked').value;
+
+    // 修正: 選択されたブランドを取得
+    const selectedBrands = Array.from(document.querySelectorAll('.brand-item:checked')).map(cb => cb.value);
+    const brandsText = selectedBrands.length > 0 ? ` (${selectedBrands.join(', ')})` : '';
 
     const displayLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')];
 
@@ -595,11 +633,16 @@ function renderPaymentCard() {
         const texts = data.options_text[lang];
         if (!texts) return '';
         
+        // 修正: カードステータス表示文言の生成
+        let cardDisplay = texts[card_status];
+        if (card_status === 'yes') {
+            cardDisplay += brandsText;
+        }
+
         const optionsHtml = `
             <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-gray-600">
                 <span class="whitespace-nowrap">${texts.cash}: <strong class="font-medium text-gray-800">${texts[cash_status]}</strong></span>
-                <span class="whitespace-nowrap">${texts.card}: <strong class="font-medium text-gray-800">${texts[card_status]}</strong></span>
-                <span class="whitespace-nowrap">${texts.qr}: <strong class="font-medium text-gray-800">${texts[qr_status]}</strong></span>
+                <span class="whitespace-nowrap">${texts.card}: <strong class="font-medium text-gray-800">${cardDisplay}</strong></span>
                 <span class="whitespace-nowrap">${texts.ic}: <strong class="font-medium text-gray-800">${texts[ic_status]}</strong></span>
             </div>
         `;
@@ -820,6 +863,12 @@ document.addEventListener('DOMContentLoaded', () => {
     createChecklist();
     setupEventListeners();
     renderPreview();
+    
+    // 初期状態のクレジットカードブランド表示制御
+    const cardYesRadio = document.getElementById('payment_card_yes');
+    if (cardYesRadio && cardYesRadio.checked) {
+        document.getElementById('card_brands_container').classList.add('visible');
+    }
 });
 </script>
 
