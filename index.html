@@ -829,7 +829,7 @@ async function generatePDF() {
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         }
         
-        pdf.save('ishikawa_dining_notice.pdf');
+        pdf.save('ishikawa_restaurant_notice.pdf');
 
     } catch(error) {
         console.error("PDF generation failed:", error);
