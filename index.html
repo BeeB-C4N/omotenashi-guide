@@ -35,8 +35,9 @@
             flex-shrink: 0; 
             background-color: #c5b37f; 
         }
+        /* 修正: タイトル文字サイズを大きく (1.3rem -> 1.55rem) */
         #preview-header h2 { 
-            font-size: 1.3rem; 
+            font-size: 1.55rem; 
             font-weight: 700; 
             color: #ffffff; 
             text-shadow: 0 1px 2px rgba(0,0,0,0.1); 
@@ -61,13 +62,15 @@
             padding: 0.75rem;
             background-color: rgba(255, 255, 255, 0.95);
         }
+        /* 修正: 文字サイズを大きく (0.9rem -> 1.15rem) */
         .welcome-message-card h3 { 
-            font-size: 0.9rem; 
+            font-size: 1.15rem; 
             font-weight: 700; 
             margin-bottom: 0.25rem; 
         }
+        /* 修正: 文字サイズを大きく (0.8rem -> 1.05rem) */
         .welcome-message-card p { 
-            font-size: 0.8rem; 
+            font-size: 1.05rem; 
             line-height: 1.35;
         }
         
@@ -124,12 +127,13 @@
             flex-direction: column; 
         }
         
+        /* 修正: 文字サイズを大きく (0.8rem -> 1.05rem) */
         .card-body {
             position: relative;
             z-index: 10; 
             flex-grow: 1;
-            font-size: 0.8rem; 
-            line-height: 1.35;
+            font-size: 1.05rem; 
+            line-height: 1.3; /* 行間を少し詰める */
         }
         
         .card-pictogram {
@@ -155,10 +159,12 @@
         }
         
         /* 日本語テキスト用のスタイル */
+        /* 修正: 文字サイズを大きく (0.75rem -> 0.9rem) */
         .jp-text-sub {
-            color: #4b5563; /* text-gray-600 相当 (少し濃いグレー) */
-            font-size: 0.75rem; /* 少し小さく */
+            color: #4b5563; 
+            font-size: 0.9rem; 
             margin-top: 0.2rem;
+            line-height: 1.3;
         }
         
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
@@ -171,11 +177,10 @@
         .radio-label { margin-left: 0.5rem; font-weight: normal; }
         .radio-group { display: flex; gap: 1rem; }
         
-        /* ブランド選択用のスタイル */
         .brand-checkbox-container {
             margin-top: 0.5rem;
             margin-left: 0.5rem;
-            display: none; /* 初期状態は非表示 */
+            display: none; 
             flex-wrap: wrap;
             gap: 0.5rem;
         }
@@ -231,7 +236,6 @@
             <aside id="control-panel" class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">表示言語 (どれか1つ選択)</label>
-                    <!-- 修正: ラジオボタンに変更 -->
                     <div id="language-selection" class="space-y-2">
                         <div class="flex items-center">
                             <input id="lang-en" name="display-lang" value="en" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-radio">
@@ -249,7 +253,6 @@
             <div class="lg:col-span-2">
                  <div id="preview-sheet-wrapper">
                     <div id="preview-sheet">
-                        <!-- 修正: ヘッダーを動的に変更するためIDのみ付与、内容はJSで制御 -->
                         <header id="preview-header"><h2 id="preview-title">Information for our Guests / お客様へのお知らせ</h2></header>
                         <main id="card-grid"></main>
                         
@@ -263,7 +266,6 @@
                                 </p>
                             </div>
                             
-                            <!-- ロゴ表示エリア (SVG) -->
                             <div class="footer-logo-container">
                                 <svg class="footer-logo-svg" 
                                      xmlns="http://www.w3.org/2000/svg" 
@@ -295,8 +297,9 @@
     </div>
 
 <script>
-const MAX_CELLS_PAGE1 = 6; 
-const MAX_CELLS_NORMAL = 10; 
+// 修正: ページごとの上限数を増やす
+const MAX_CELLS_PAGE1 = 8; 
+const MAX_CELLS_NORMAL = 12; 
 
 let currentPage = 1;
 
@@ -482,7 +485,7 @@ const phrasesData = {
                 svgPath: './17.svg', 
                 content: {
                     en: { title: 'Service Delays', description: 'Please note that, when we are particularly busy, it may take longer than usual to prepare your food, or for staff members to assist you.'},
-                    zh: { title: '關於等待時間', description: '用餐人數眾多時，店員的服務及料理的提供可能需要稍加等候。'}
+                    zh: { title: '關於等待時間', description: '用餐人數眾多時，店員の服務及料理の提供可能需要稍加等候。'}
                 }
             },
             call_staff_new: {
@@ -590,16 +593,7 @@ function createChecklist() {
 }
 
 function setupEventListeners() {
-    // 言語選択ラジオボタンのイベントリスナー
-    const langRadios = document.querySelectorAll('.lang-radio');
-    langRadios.forEach(el => {
-        el.addEventListener('change', () => {
-            currentPage = 1;
-            renderPreview();
-        });
-    });
-
-    const inputs = document.querySelectorAll('.checkbox-item, .radio-item');
+    const inputs = document.querySelectorAll('.lang-checkbox, .checkbox-item, .radio-item');
     inputs.forEach(el => {
         el.addEventListener('change', () => {
             currentPage = 1;
@@ -613,6 +607,14 @@ function setupEventListeners() {
                     }
                 }
             }
+            renderPreview();
+        });
+    });
+    
+    const langRadios = document.querySelectorAll('.lang-radio');
+    langRadios.forEach(el => {
+        el.addEventListener('change', () => {
+            currentPage = 1;
             renderPreview();
         });
     });
@@ -644,7 +646,7 @@ function setupEventListeners() {
 
 function renderPaymentCard() {
     const data = phrasesData.payment.items.payment_options;
-    const selectedLang = getSelectedLang(); // 単一選択に変更
+    const selectedLang = document.querySelector('.lang-radio:checked')?.value || 'en';
     
     const cash_status = document.querySelector('input[name="payment_cash"]:checked').value;
     const card_status = document.querySelector('input[name="payment_card"]:checked').value;
@@ -653,7 +655,6 @@ function renderPaymentCard() {
     const selectedBrands = Array.from(document.querySelectorAll('.brand-item:checked')).map(cb => cb.value);
     const brandsText = selectedBrands.length > 0 ? ` (${selectedBrands.join(', ')})` : '';
 
-    // 表示順序を [外国語, 日本語] に固定
     const displayLangs = [selectedLang, 'jp'];
 
     const cardBodyHtml = displayLangs.map(lang => {
@@ -674,7 +675,6 @@ function renderPaymentCard() {
         `;
 
         if (lang === 'jp') {
-             // 日本語は下に、薄いグレーで表示
              return `<div class="mb-2 last:mb-0 jp-text-sub">
                           <p class="font-semibold">会計方式</p>
                           <p>以下の決済が可能です。</p>
@@ -699,7 +699,7 @@ function renderPaymentCard() {
 
 function renderPreview() {
     const allStandardCardKeys = getCheckedItemKeys(); 
-    const selectedLang = getSelectedLang();
+    const selectedLang = document.querySelector('.lang-radio:checked')?.value || 'en';
     const isPaymentChecked = document.getElementById('payment_options').checked;
     
     const cardGrid = document.getElementById('card-grid');
@@ -714,9 +714,8 @@ function renderPreview() {
     document.getElementById('placeholder').style.display = 'none';
     document.getElementById('preview-sheet').style.display = 'flex';
 
-    // ヘッダータイトルの更新 (選択した言語 / お客様へのお知らせ)
-    const headerTitle = `${headerTitleData[selectedLang]} / ${headerTitleData['jp']}`;
-    document.getElementById('preview-title').textContent = headerTitle;
+    // ヘッダー更新
+    document.getElementById('preview-title').textContent = `${headerTitleData[selectedLang]} / ${headerTitleData['jp']}`;
 
     const cardsOnPage1 = isPaymentChecked ? (MAX_CELLS_PAGE1 - 2) : MAX_CELLS_PAGE1;
     
@@ -732,19 +731,15 @@ function renderPreview() {
     cardGrid.innerHTML = ''; 
 
     if (currentPage === 1) {
-        // Welcome Messageも [外国語, 日本語] の順で表示
         const welcomeLangs = [selectedLang, 'jp'];
         const welcomeHtml = welcomeLangs.map(lang => {
             const data = welcomeMessageData[lang];
             if (!data) return '';
             
             if (lang === 'jp') {
-                // 日本語は薄いグレー、小さめ
                 return `<div class="mb-2 jp-text-sub"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
-            } else {
-                // 外国語はメイン
-                return `<div class="mb-2"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
             }
+            return `<div class="mb-2"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
         }).join('');
         cardGrid.innerHTML += `<div class="welcome-message-card">${welcomeHtml}</div>`;
         
@@ -758,7 +753,7 @@ function renderPreview() {
         if (!data) return '';
         
         let cardBodyHtml = '';
-        const displayLangs = [selectedLang, 'jp']; // 外国語優先
+        const displayLangs = [selectedLang, 'jp'];
         
         cardBodyHtml = displayLangs.map(lang => {
             if (lang === 'jp') {
@@ -767,7 +762,6 @@ function renderPreview() {
                       const timeValue = document.getElementById(`${key}-input`).value || '?';
                       jp_desc = jp_desc.replace(/(\d*\.?\d*時間)/, `${timeValue}時間`);
                  }
-                 // 日本語スタイル適用
                  return `<div class="mb-2 last:mb-0 jp-text-sub"><p class="font-semibold">${jp_desc}</p></div>`;
             }
             const content = data.content[lang];
@@ -777,7 +771,6 @@ function renderPreview() {
                 const timeValue = document.getElementById(`${key}-input`).value || '?';
                 description = description.replace('{time}', timeValue);
             }
-            // 外国語メイン
             return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${content.title}</p><p class="text-gray-600">${description}</p></div>`;
         }).join('');
 
@@ -831,9 +824,8 @@ async function generatePDF() {
     const originalPage = currentPage;
     const previewSheet = document.getElementById('preview-sheet');
 
-    // 対策: 一時的に幅を固定して、ディスプレイの拡大率(DPIスケーリング)の影響を受けないようにする
     const originalWidth = previewSheet.style.width;
-    previewSheet.style.width = '800px'; // A4縦横比を維持するための基準幅（高解像度で見える幅）
+    previewSheet.style.width = '800px'; 
 
     try {
         for (let i = 1; i <= totalPages; i++) {
@@ -855,9 +847,9 @@ async function generatePDF() {
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: null,
-                width: previewSheet.offsetWidth, // 固定した幅を使用
+                width: previewSheet.offsetWidth, 
                 height: previewSheet.offsetHeight,
-                windowWidth: 800, // ウィンドウ幅も固定とみなしてレンダリングさせる
+                windowWidth: 800, 
                 imageTimeout: 15000, 
             });
             
@@ -876,7 +868,6 @@ async function generatePDF() {
         console.error("PDF generation failed:", error);
         alert("PDF生成エラー: 画像の読み込み等に失敗している可能性があります。");
     } finally {
-        // 元に戻す
         previewSheet.style.width = originalWidth;
         currentPage = originalPage;
         renderPreview();
@@ -893,11 +884,6 @@ function findItemByKey(key) {
     }
     return null;
 }
-// 修正: 単一の言語コードを返す関数に変更
-function getSelectedLang() { 
-    const checked = document.querySelector('.lang-radio:checked');
-    return checked ? checked.value : 'en'; 
-}
 function getCheckedItemKeys() { 
     return Array.from(document.querySelectorAll('.checkbox-item:checked'))
             .map(checkbox => checkbox.id)
@@ -909,7 +895,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     renderPreview();
     
-    // 初期状態のクレジットカードブランド表示制御
     const cardYesRadio = document.getElementById('payment_card_yes');
     if (cardYesRadio && cardYesRadio.checked) {
         document.getElementById('card_brands_container').classList.add('visible');
