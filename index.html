@@ -154,6 +154,13 @@
             object-fit: contain; 
         }
         
+        /* 日本語テキスト用のスタイル */
+        .jp-text-sub {
+            color: #4b5563; /* text-gray-600 相当 (少し濃いグレー) */
+            font-size: 0.75rem; /* 少し小さく */
+            margin-top: 0.2rem;
+        }
+        
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
         #loader.hidden { display: none; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin-bottom: 1rem; }
@@ -223,10 +230,17 @@
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <aside id="control-panel" class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">表示言語 (複数選択可)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">表示言語 (どれか1つ選択)</label>
+                    <!-- 修正: ラジオボタンに変更 -->
                     <div id="language-selection" class="space-y-2">
-                        <div><input id="lang-en" value="en" type="checkbox" checked class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-checkbox"><label for="lang-en" class="ml-2 text-sm text-gray-800">English (英語)</label></div>
-                        <div><input id="lang-zh" value="zh" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-checkbox"><label for="lang-zh" class="ml-2 text-sm text-gray-800">中文 (中国語／繁体字)</label></div>
+                        <div class="flex items-center">
+                            <input id="lang-en" name="display-lang" value="en" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-radio">
+                            <label for="lang-en" class="ml-2 text-sm text-gray-800">English (英語)</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="lang-zh" name="display-lang" value="zh" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-radio">
+                            <label for="lang-zh" class="ml-2 text-sm text-gray-800">中文 (中国語／繁体字)</label>
+                        </div>
                     </div>
                 </div>
                 <div id="checklist-sections"></div>
@@ -235,7 +249,8 @@
             <div class="lg:col-span-2">
                  <div id="preview-sheet-wrapper">
                     <div id="preview-sheet">
-                        <header id="preview-header"><h2>お客様へのお知らせ / Information for our Guests</h2></header>
+                        <!-- 修正: ヘッダーを動的に変更するためIDのみ付与、内容はJSで制御 -->
+                        <header id="preview-header"><h2 id="preview-title">Information for our Guests / お客様へのお知らせ</h2></header>
                         <main id="card-grid"></main>
                         
                         <footer id="preview-footer">
@@ -286,6 +301,12 @@ const MAX_CELLS_NORMAL = 10;
 let currentPage = 1;
 
 // --- データ定義 ---
+const headerTitleData = {
+    en: "Information for our Guests",
+    zh: "顧客須知",
+    jp: "お客様へのお知らせ"
+};
+
 const welcomeMessageData = {
     en: {
         title: 'Information for Our Guests before the Meal',
@@ -517,12 +538,11 @@ function createChecklist() {
                                     <input id="payment_card_yes" name="payment_card" value="yes" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_card_yes" class="radio-label">可</label>
                                     <input id="payment_card_no" name="payment_card" value="no" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 radio-item"><label for="payment_card_no" class="radio-label">不可</label>
                                 </div>
-                                <!-- 修正: ブランド選択チェックボックス追加 -->
                                 <div id="card_brands_container" class="brand-checkbox-container">
                                     <div class="brand-label"><input type="checkbox" id="brand_visa" value="VISA" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 brand-item mr-1"> VISA</div>
                                     <div class="brand-label"><input type="checkbox" id="brand_master" value="Mastercard" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 brand-item mr-1"> Mastercard</div>
                                     <div class="brand-label"><input type="checkbox" id="brand_amex" value="American Express" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 brand-item mr-1"> American Express</div>
-                                    <div class="brand-label"><input type="checkbox" id="brand_unionpay" value="UnionPay（銀聯）" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 brand-item mr-1"> UnionPay（銀聯）</div>
+                                    <div class="brand-label"><input type="checkbox" id="brand_unionpay" value="UnionPay" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 brand-item mr-1"> UnionPay（銀聯）</div>
                                 </div>
                             </div>
                              <div>
@@ -570,11 +590,19 @@ function createChecklist() {
 }
 
 function setupEventListeners() {
-    const inputs = document.querySelectorAll('.lang-checkbox, .checkbox-item, .radio-item');
+    // 言語選択ラジオボタンのイベントリスナー
+    const langRadios = document.querySelectorAll('.lang-radio');
+    langRadios.forEach(el => {
+        el.addEventListener('change', () => {
+            currentPage = 1;
+            renderPreview();
+        });
+    });
+
+    const inputs = document.querySelectorAll('.checkbox-item, .radio-item');
     inputs.forEach(el => {
         el.addEventListener('change', () => {
             currentPage = 1;
-            // 修正: クレジットカードのラジオボタン変更時にブランド表示制御
             if(el.name === 'payment_card') {
                 const brandsContainer = document.getElementById('card_brands_container');
                 if (brandsContainer) {
@@ -589,7 +617,6 @@ function setupEventListeners() {
         });
     });
     
-    // 修正: ブランドチェックボックスのイベントリスナー追加
     const brandInputs = document.querySelectorAll('.brand-item');
     brandInputs.forEach(el => {
         el.addEventListener('change', () => {
@@ -617,23 +644,22 @@ function setupEventListeners() {
 
 function renderPaymentCard() {
     const data = phrasesData.payment.items.payment_options;
-    const selectedLangs = getSelectedLangs();
+    const selectedLang = getSelectedLang(); // 単一選択に変更
     
     const cash_status = document.querySelector('input[name="payment_cash"]:checked').value;
     const card_status = document.querySelector('input[name="payment_card"]:checked').value;
     const ic_status = document.querySelector('input[name="payment_ic"]:checked').value;
 
-    // 修正: 選択されたブランドを取得
     const selectedBrands = Array.from(document.querySelectorAll('.brand-item:checked')).map(cb => cb.value);
     const brandsText = selectedBrands.length > 0 ? ` (${selectedBrands.join(', ')})` : '';
 
-    const displayLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')];
+    // 表示順序を [外国語, 日本語] に固定
+    const displayLangs = [selectedLang, 'jp'];
 
     const cardBodyHtml = displayLangs.map(lang => {
         const texts = data.options_text[lang];
         if (!texts) return '';
         
-        // 修正: カードステータス表示文言の生成
         let cardDisplay = texts[card_status];
         if (card_status === 'yes') {
             cardDisplay += brandsText;
@@ -648,9 +674,10 @@ function renderPaymentCard() {
         `;
 
         if (lang === 'jp') {
-             return `<div class="mb-2 last:mb-0">
-                          <p class="font-semibold text-gray-800">会計方式</p>
-                          <p class="text-gray-600">以下の決済が可能です。</p>
+             // 日本語は下に、薄いグレーで表示
+             return `<div class="mb-2 last:mb-0 jp-text-sub">
+                          <p class="font-semibold">会計方式</p>
+                          <p>以下の決済が可能です。</p>
                           ${optionsHtml}
                       </div>`;
         }
@@ -672,7 +699,7 @@ function renderPaymentCard() {
 
 function renderPreview() {
     const allStandardCardKeys = getCheckedItemKeys(); 
-    const selectedLangs = getSelectedLangs();
+    const selectedLang = getSelectedLang();
     const isPaymentChecked = document.getElementById('payment_options').checked;
     
     const cardGrid = document.getElementById('card-grid');
@@ -686,6 +713,10 @@ function renderPreview() {
     
     document.getElementById('placeholder').style.display = 'none';
     document.getElementById('preview-sheet').style.display = 'flex';
+
+    // ヘッダータイトルの更新 (選択した言語 / お客様へのお知らせ)
+    const headerTitle = `${headerTitleData[selectedLang]} / ${headerTitleData['jp']}`;
+    document.getElementById('preview-title').textContent = headerTitle;
 
     const cardsOnPage1 = isPaymentChecked ? (MAX_CELLS_PAGE1 - 2) : MAX_CELLS_PAGE1;
     
@@ -701,11 +732,19 @@ function renderPreview() {
     cardGrid.innerHTML = ''; 
 
     if (currentPage === 1) {
-        const welcomeLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')];
+        // Welcome Messageも [外国語, 日本語] の順で表示
+        const welcomeLangs = [selectedLang, 'jp'];
         const welcomeHtml = welcomeLangs.map(lang => {
             const data = welcomeMessageData[lang];
             if (!data) return '';
-            return `<div class="mb-2"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
+            
+            if (lang === 'jp') {
+                // 日本語は薄いグレー、小さめ
+                return `<div class="mb-2 jp-text-sub"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
+            } else {
+                // 外国語はメイン
+                return `<div class="mb-2"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
+            }
         }).join('');
         cardGrid.innerHTML += `<div class="welcome-message-card">${welcomeHtml}</div>`;
         
@@ -719,7 +758,7 @@ function renderPreview() {
         if (!data) return '';
         
         let cardBodyHtml = '';
-        const displayLangs = ['jp', ...selectedLangs.filter(l => l !== 'jp')];
+        const displayLangs = [selectedLang, 'jp']; // 外国語優先
         
         cardBodyHtml = displayLangs.map(lang => {
             if (lang === 'jp') {
@@ -728,7 +767,8 @@ function renderPreview() {
                       const timeValue = document.getElementById(`${key}-input`).value || '?';
                       jp_desc = jp_desc.replace(/(\d*\.?\d*時間)/, `${timeValue}時間`);
                  }
-                 return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${jp_desc}</p></div>`;
+                 // 日本語スタイル適用
+                 return `<div class="mb-2 last:mb-0 jp-text-sub"><p class="font-semibold">${jp_desc}</p></div>`;
             }
             const content = data.content[lang];
             if (!content) return '';
@@ -737,6 +777,7 @@ function renderPreview() {
                 const timeValue = document.getElementById(`${key}-input`).value || '?';
                 description = description.replace('{time}', timeValue);
             }
+            // 外国語メイン
             return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${content.title}</p><p class="text-gray-600">${description}</p></div>`;
         }).join('');
 
@@ -829,7 +870,7 @@ async function generatePDF() {
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         }
         
-        pdf.save('ishikawa_restaurant_notice.pdf');
+        pdf.save('ishikawa_dining_notice.pdf');
 
     } catch(error) {
         console.error("PDF generation failed:", error);
@@ -852,7 +893,11 @@ function findItemByKey(key) {
     }
     return null;
 }
-function getSelectedLangs() { return Array.from(document.querySelectorAll('.lang-checkbox:checked')).map(cb => cb.value); }
+// 修正: 単一の言語コードを返す関数に変更
+function getSelectedLang() { 
+    const checked = document.querySelector('.lang-radio:checked');
+    return checked ? checked.value : 'en'; 
+}
 function getCheckedItemKeys() { 
     return Array.from(document.querySelectorAll('.checkbox-item:checked'))
             .map(checkbox => checkbox.id)
