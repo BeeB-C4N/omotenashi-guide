@@ -35,7 +35,7 @@
             flex-shrink: 0; 
             background-color: #c5b37f; 
         }
-        /* 修正: タイトル文字サイズを大きく (1.3rem -> 1.55rem) */
+        /* タイトル文字サイズ */
         #preview-header h2 { 
             font-size: 1.55rem; 
             font-weight: 700; 
@@ -62,13 +62,11 @@
             padding: 0.75rem;
             background-color: rgba(255, 255, 255, 0.95);
         }
-        /* 修正: 文字サイズを大きく (0.9rem -> 1.15rem) */
         .welcome-message-card h3 { 
             font-size: 1.15rem; 
             font-weight: 700; 
             margin-bottom: 0.25rem; 
         }
-        /* 修正: 文字サイズを大きく (0.8rem -> 1.05rem) */
         .welcome-message-card p { 
             font-size: 1.05rem; 
             line-height: 1.35;
@@ -127,13 +125,12 @@
             flex-direction: column; 
         }
         
-        /* 修正: 文字サイズを大きく (0.8rem -> 1.05rem) */
         .card-body {
             position: relative;
             z-index: 10; 
             flex-grow: 1;
             font-size: 1.05rem; 
-            line-height: 1.3; /* 行間を少し詰める */
+            line-height: 1.3; 
         }
         
         .card-pictogram {
@@ -159,12 +156,20 @@
         }
         
         /* 日本語テキスト用のスタイル */
-        /* 修正: 文字サイズを大きく (0.75rem -> 0.9rem) */
+        /* 修正: 文字サイズを大幅に縮小 (0.9rem -> 0.6rem) し、補助的な見た目にする */
         .jp-text-sub {
-            color: #4b5563; 
-            font-size: 0.9rem; 
-            margin-top: 0.2rem;
-            line-height: 1.3;
+            color: #6b7280; /* text-gray-500 */
+            font-size: 0.6rem; 
+            margin-top: 0.1rem;
+            line-height: 1.2;
+            font-weight: normal;
+        }
+
+        /* ヘッダー内の日本語サブタイトル用 */
+        .header-jp-sub {
+            font-size: 0.6em; /* メインタイトルの60% */
+            font-weight: normal;
+            margin-left: 0.5rem;
         }
         
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; flex-direction: column; }
@@ -253,7 +258,7 @@
             <div class="lg:col-span-2">
                  <div id="preview-sheet-wrapper">
                     <div id="preview-sheet">
-                        <header id="preview-header"><h2 id="preview-title">Information for our Guests / お客様へのお知らせ</h2></header>
+                        <header id="preview-header"><h2 id="preview-title">Information for our Guests <span class="header-jp-sub">/ お客様へのお知らせ</span></h2></header>
                         <main id="card-grid"></main>
                         
                         <footer id="preview-footer">
@@ -297,7 +302,6 @@
     </div>
 
 <script>
-// 修正: ページごとの上限数を増やす
 const MAX_CELLS_PAGE1 = 8; 
 const MAX_CELLS_NORMAL = 12; 
 
@@ -667,7 +671,7 @@ function renderPaymentCard() {
         }
 
         const optionsHtml = `
-            <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-gray-600">
+            <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-gray-600">
                 <span class="whitespace-nowrap">${texts.cash}: <strong class="font-medium text-gray-800">${texts[cash_status]}</strong></span>
                 <span class="whitespace-nowrap">${texts.card}: <strong class="font-medium text-gray-800">${cardDisplay}</strong></span>
                 <span class="whitespace-nowrap">${texts.ic}: <strong class="font-medium text-gray-800">${texts[ic_status]}</strong></span>
@@ -675,15 +679,15 @@ function renderPaymentCard() {
         `;
 
         if (lang === 'jp') {
-             return `<div class="mb-2 last:mb-0 jp-text-sub">
-                          <p class="font-semibold">会計方式</p>
-                          <p>以下の決済が可能です。</p>
+             // 修正: 日本語スタイル適用
+             return `<div class="mb-1 last:mb-0 jp-text-sub">
+                          <p>会計方式: 以下の決済が可能です。</p>
                           ${optionsHtml}
                       </div>`;
         }
 
         const content = data.content[lang];
-        return `<div class="mb-2 last:mb-0">
+        return `<div class="mb-1 last:mb-0">
                     <p class="font-semibold text-gray-800">${content.title}</p>
                     <p class="text-gray-600">${content.description}</p>
                     ${optionsHtml}
@@ -714,8 +718,10 @@ function renderPreview() {
     document.getElementById('placeholder').style.display = 'none';
     document.getElementById('preview-sheet').style.display = 'flex';
 
-    // ヘッダー更新
-    document.getElementById('preview-title').textContent = `${headerTitleData[selectedLang]} / ${headerTitleData['jp']}`;
+    // ヘッダー更新: 日本語サブタイトルを修正
+    const selectedHeader = headerTitleData[selectedLang];
+    const jpHeader = headerTitleData['jp'];
+    document.getElementById('preview-title').innerHTML = `${selectedHeader} <span class="header-jp-sub">/ ${jpHeader}</span>`;
 
     const cardsOnPage1 = isPaymentChecked ? (MAX_CELLS_PAGE1 - 2) : MAX_CELLS_PAGE1;
     
@@ -737,7 +743,8 @@ function renderPreview() {
             if (!data) return '';
             
             if (lang === 'jp') {
-                return `<div class="mb-2 jp-text-sub"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
+                // 修正: 日本語は薄いグレー、小さめ
+                return `<div class="mb-2 jp-text-sub"><h3 class="font-bold inline mr-2">${data.title}</h3><span>${data.description}</span></div>`;
             }
             return `<div class="mb-2"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
         }).join('');
@@ -762,7 +769,8 @@ function renderPreview() {
                       const timeValue = document.getElementById(`${key}-input`).value || '?';
                       jp_desc = jp_desc.replace(/(\d*\.?\d*時間)/, `${timeValue}時間`);
                  }
-                 return `<div class="mb-2 last:mb-0 jp-text-sub"><p class="font-semibold">${jp_desc}</p></div>`;
+                 // 修正: 日本語スタイル適用
+                 return `<div class="mb-1 last:mb-0 jp-text-sub">${jp_desc}</div>`;
             }
             const content = data.content[lang];
             if (!content) return '';
