@@ -156,13 +156,18 @@
         }
         
         /* 日本語テキスト用のスタイル */
-        /* 修正: 文字サイズを大幅に縮小 (0.9rem -> 0.6rem) し、補助的な見た目にする */
+        /* 修正: マージンを増やして間隔を広げる (0.1rem -> 0.4rem) */
         .jp-text-sub {
             color: #6b7280; /* text-gray-500 */
             font-size: 0.6rem; 
-            margin-top: 0.1rem;
+            margin-top: 0.4rem; 
             line-height: 1.2;
             font-weight: normal;
+        }
+
+        /* 修正: 日本語サブテキスト内の見出しも小さくする（太字は維持） */
+        .welcome-message-card .jp-text-sub h3 {
+            font-size: inherit;
         }
 
         /* ヘッダー内の日本語サブタイトル用 */
@@ -262,14 +267,8 @@
                         <main id="card-grid"></main>
                         
                         <footer id="preview-footer">
-                            <div class="footer-text">
-                                <p>※掲載内容は変更になる場合がございます。ご不明な点はスタッフまでお尋ねください。<br>
-                                Information may be subject to change. If you have any questions, please kindly ask our staff.</p>
-                                <p class="mt-2 pt-2 border-t border-white/30">
-                                    この案内は、石川県が提供するサービスを使って作成されました。<br>
-                                    This information was created using services provided by Ishikawa Prefecture.
-                                </p>
-                            </div>
+                            <!-- フッターテキストはJSで挿入 -->
+                            <div class="footer-text"></div>
                             
                             <div class="footer-logo-container">
                                 <svg class="footer-logo-svg" 
@@ -326,6 +325,21 @@ const welcomeMessageData = {
     jp: {
         title: 'お食事の前に － お客様へのお願い',
         description: 'ご来店いただきありがとうございます。楽しくお食事を楽しんでいただくために、以下の事項について予めお客様にご了承いただきますよう、お願いします。ご理解とご協力の程、よろしくお願いいたします。'
+    }
+};
+
+const footerData = {
+    en: {
+        note: "Information may be subject to change. If you have any questions, please kindly ask our staff.",
+        credit: "This information was created using services provided by Ishikawa Prefecture."
+    },
+    zh: {
+        note: "刊載內容可能會有所變更。如有任何疑問，請洽詢店內人員。",
+        credit: "本指南是使用石川縣提供的服務所製作。"
+    },
+    jp: {
+        note: "※掲載内容は変更になる場合がございます。ご不明な点はスタッフまでお尋ねください。",
+        credit: "この案内は、石川県が提供するサービスを使って作成されました。"
     }
 };
 
@@ -788,6 +802,24 @@ function renderPreview() {
                 ${createPictogramHtml(data.svgPath)}
             </div>`;
     }).join('');
+
+    // フッター更新
+    const footerContent = document.querySelector('#preview-footer .footer-text');
+    const footerNote = footerData[selectedLang].note;
+    const footerCredit = footerData[selectedLang].credit;
+    const footerNoteJp = footerData['jp'].note;
+    const footerCreditJp = footerData['jp'].credit;
+
+    footerContent.innerHTML = `
+        <div class="mb-2">
+            <p>${footerNote}</p>
+            <p class="jp-text-sub">${footerNoteJp}</p>
+        </div>
+        <div class="mt-2 pt-2 border-t border-white/30">
+            <p>${footerCredit}</p>
+            <p class="jp-text-sub">${footerCreditJp}</p>
+        </div>
+    `;
 
     cardGrid.innerHTML += cardHtml;
     updatePaginationControls();
