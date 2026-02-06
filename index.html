@@ -8,23 +8,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- 修正: Noto Sans KR を追加 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.js"></script>
     
     <!-- スタイル -->
     <style>
-        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; }
+        /* 修正: フォントファミリーに Noto Sans KR を追加 */
+        body { font-family: 'Inter', 'Noto Sans JP', 'Noto Sans KR', sans-serif; }
         
         #preview-sheet {
             background-color: #f4f3ec;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
-            width: 100%; /* 通常時は親要素に合わせる */
+            width: 100%;
             aspect-ratio: 210 / 297;
             position: relative;
-            /* PDF生成時のレイアウト崩れを防ぐため、ボックスサイズ計算を明確にする */
             box-sizing: border-box;
         }
 
@@ -35,7 +36,6 @@
             flex-shrink: 0; 
             background-color: #c5b37f; 
         }
-        /* タイトル文字サイズ */
         #preview-header h2 { 
             font-size: 1.55rem; 
             font-weight: 700; 
@@ -70,6 +70,7 @@
         .welcome-message-card p { 
             font-size: 1.05rem; 
             line-height: 1.35;
+            white-space: pre-wrap; /* 改行コードを反映 */
         }
         
         .payment-options-card {
@@ -155,24 +156,20 @@
             object-fit: contain; 
         }
         
-        /* 日本語テキスト用のスタイル */
-        /* 修正: マージンを増やして間隔を広げる (0.1rem -> 0.4rem) */
         .jp-text-sub {
-            color: #6b7280; /* text-gray-500 */
+            color: #6b7280; 
             font-size: 0.6rem; 
             margin-top: 0.4rem; 
             line-height: 1.2;
             font-weight: normal;
         }
 
-        /* 修正: 日本語サブテキスト内の見出しも小さくする（太字は維持） */
         .welcome-message-card .jp-text-sub h3 {
             font-size: inherit;
         }
 
-        /* ヘッダー内の日本語サブタイトル用 */
         .header-jp-sub {
-            font-size: 0.6em; /* メインタイトルの60% */
+            font-size: 0.6em; 
             font-weight: normal;
             margin-left: 0.5rem;
         }
@@ -255,6 +252,11 @@
                             <input id="lang-zh" name="display-lang" value="zh" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-radio">
                             <label for="lang-zh" class="ml-2 text-sm text-gray-800">中文 (中国語／繁体字)</label>
                         </div>
+                        <!-- 修正: 韓国語ラジオボタン追加 -->
+                        <div class="flex items-center">
+                            <input id="lang-ko" name="display-lang" value="ko" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 lang-radio">
+                            <label for="lang-ko" class="ml-2 text-sm text-gray-800">한국어 (韓国語)</label>
+                        </div>
                     </div>
                 </div>
                 <div id="checklist-sections"></div>
@@ -310,6 +312,8 @@ let currentPage = 1;
 const headerTitleData = {
     en: "Information for our Guests",
     zh: "顧客須知",
+    // 修正: 韓国語ヘッダー追加
+    ko: "고객님께 드리는 알림",
     jp: "お客様へのお知らせ"
 };
 
@@ -321,6 +325,11 @@ const welcomeMessageData = {
     zh: {
         title: '在用餐之前 － 注意事項',
         description: '感謝您蒞臨本店。為了讓您有良好的用餐體驗，請務必詳讀下列事項。感謝您的理解與協助。'
+    },
+    // 修正: 韓国語Welcome追加
+    ko: {
+        title: '식사 전에 고객님께 드리는 부탁',
+        description: '저희 매장을 방문해 주셔서 감사합니다. \n즐겁게 식사하실 수 있도록 아래 사항에 대해 미리 고객님의 양해 말씀을 드립니다. \n고객님의 이해와 협조를 부탁드립니다.'
     },
     jp: {
         title: 'お食事の前に － お客様へのお願い',
@@ -337,6 +346,11 @@ const footerData = {
         note: "刊載內容可能會有所變更。如有任何疑問，請洽詢店內人員。",
         credit: "本指南是使用石川縣提供的服務所製作。"
     },
+    // 修正: 韓国語フッター追加
+    ko: {
+        note: "게재 내용은 변경되는 경우가 있습니다. 불명확한 점이 있으시면 직원에게 문의해 주십시오.",
+        credit: "안내는 이시카와현이 제공하는 서비스를 사용하여 작성된 것입니다."
+    },
     jp: {
         note: "※掲載内容は変更になる場合がございます。ご不明な点はスタッフまでお尋ねください。",
         credit: "この案内は、石川県が提供するサービスを使って作成されました。"
@@ -351,6 +365,8 @@ const phrasesData = {
                 jp_label: '会計は以下に対応しています。詳細はスタッフまでお尋ねください。',
                 svgPath: './1.svg', 
                 hasCustomUI: true,
+                // 修正: 韓国語テキスト追加
+                ko_label: '결제는 아래와 같은 방법으로 대응하고 있습니다.  상세 내용은 직원에게 문의해 주세요.',
                 content: {
                     en: { title: 'Payment Methods', description: 'We accept the following payment method(s). For details, please ask a member of our staff.'},
                     zh: { title: '結帳方式', description: '提供以下結帳方式。詳情請詢問店內人員。'}
@@ -358,12 +374,16 @@ const phrasesData = {
                 options_text: {
                     en: { yes: 'Yes', no: 'No', cash: 'Cash', card: 'Credit Cards', ic: 'Transit IC Cards' },
                     zh: { yes: '可', no: '不可', cash: '現金', card: '信用卡', ic: '交通IC卡' },
+                    // 修正: 韓国語選択肢追加
+                    ko: { yes: '가능', no: '불가능', cash: '현금', card: '크레딧카드', ic: '교통카드 IC' },
                     jp: { yes: '可', no: '不可', cash: '現金', card: 'クレジットカード', ic: '交通系IC' }
                 }
             },
             no_split_bill_new: {
                 jp_label: '会計はグループ単位でまとめていただきますよう、お願いします。',
                 svgPath: './3.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '계산은 더치패이가 아니라 한번에 지불하시도록 부탁드립니다.',
                 content: {
                     en: { title: 'Single Payment', description: 'We ask that you please pay for the entire party together in a single payment.'},
                     zh: { title: '統一結帳', description: '請以團體為單位結帳。'}
@@ -377,6 +397,8 @@ const phrasesData = {
             otoshi_charge: {
                 jp_label: 'お席料として"お通し"をお出しします。"お通し"は料理提供までの間を繋ぐ、日本の居酒屋文化で一般的な慣習です。',
                 svgPath: './2.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '자리 비용으로 “오토시(자릿세 형식으로 제공되는 기본 안주)”가 나옵니다. “오토시”는 본 요리를 드리기 전에 미리 나오는 안주로 일본 이자카야 문화에서는 일반적인 관습입니다.',
                 content: {
                     en: { title: 'About "Otoshi" (Appetizer)', description: 'This restaurant serves o-toshi, a small appetizer included as part of the seating charge. This is a common custom at izakaya restaurants in Japan.'},
                     zh: { title: '關於「開胃小菜」', description: '我們將提供「開胃小菜」作為座位費用。「開胃小菜」是讓您等待上菜時享用的料理，屬於日本居酒屋文化常見的習慣。'}
@@ -385,6 +407,8 @@ const phrasesData = {
             table_charge_only: {
                 jp_label: 'お席料（テーブルチャージ）を頂戴しております。',
                 svgPath: './4.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '자릿세(서비스 요금)를 받고 있습니다.',
                 content: {
                     en: { title: 'Seating Charge', description: 'We have a seating charge.'},
                     zh: { title: '座位費用', description: '會收取座位費用。'}
@@ -393,6 +417,8 @@ const phrasesData = {
             market_price_new: {
                 jp_label: '一部商品は"時価"です。価格はお尋ねください。"時価"の商品は、鮮魚等の仕入れ値により価格が変動します。',
                 svgPath: './5.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '일부 상품은 “시가”입니다.  가격은 문의해주세요. “시가” 상품은 선어(신선한 생선) 등의 구입비 가격 변동에 따라 가격이 달라집니다.',
                 content: {
                     en: { title: 'About "Market Price"', description: 'Some of our menu items are “market price,” due to prices that can vary from day to day for items such as fresh seafood. Please ask for today’s price if you are interested.'},
                     zh: { title: '關於「時價」', description: '部分商品採用「時價」計價。請向店內人員詢價。採用「時價」的商品，會隨著鮮魚等貨物的進貨成本而波動。'}
@@ -401,6 +427,8 @@ const phrasesData = {
             dietary_restrictions: {
                 jp_label: 'アレルギーや宗教・思想などによる食事制限につきましては、可能な範囲で対応しますので、事前にご相談ください。',
                 svgPath: './6.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '알레르기나 종교, 사상 등에 따라 식사에 제한이 있는 경우에는 가능한 범위 내에서만 대응이 가능하므로 사전에 미리 말씀해 주시기를 부탁드립니다.',
                 content: {
                     en: { title: 'Dietary Restrictions', description: 'Please let us know if you have any food allergies, or dietary restrictions (religious or otherwise), and we will try to accommodate them as much as we can.'},
                     zh: { title: '飲食限制', description: '因過敏、宗教、理念等原因而有飲食限制的客人，我們會在能力範圍內為您提供服務，請事先告知相關需求。'}
@@ -409,6 +437,8 @@ const phrasesData = {
             no_take_away_new: {
                 jp_label: '食べ残しのお持ち帰りはご遠慮ください。',
                 svgPath: './7.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '드시고 남은 음식은 포장하여 가져가실 수 없으므로 양해를 부탁드립니다.',
                 content: {
                     en: { title: 'No Take-out for Leftovers', description: 'We do not offer take-out for leftover food.'},
                     zh: { title: '請勿打包剩菜', description: '請勿将吃剩的食物打包带走。'}
@@ -417,6 +447,8 @@ const phrasesData = {
             paid_water: {
                 jp_label: 'お水は有料でのご提供となります。',
                 svgPath: './8.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '물은 유료로 제공해 드립니다.',
                 content: {
                     en: { title: 'Water', description: 'Water is available, but as a paid menu item.'},
                     zh: { title: '飲用水', description: '飲用水需付費。'}
@@ -425,6 +457,8 @@ const phrasesData = {
             one_order_rule: {
                 jp_label: 'お一人様1オーダー以上をお願いします。',
                 svgPath: './9.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '1인분 이상의 주문을 부탁드립니다.',
                 content: {
                     en: { title: 'Minimum Order', description: 'We ask that you please order at least one menu item per person.'},
                     zh: { title: '最低消費', description: '每位客人至少需點一份飲料或餐點。'}
@@ -438,6 +472,8 @@ const phrasesData = {
             ask_for_photos_new: {
                 jp_label: '店内撮影はプライバシーや雰囲気保持のため、事前にスタッフへご確認ください。',
                 svgPath: './10.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '가게 내에서의 사진촬영은 프라이버시 보호와 분위기 유지를 위하여 사전에 직원에게 가능 여부를 문의해 주시기를 부탁드립니다.',
                 content: {
                     en: { title: 'Photography', description: 'To ensure a comfortable atmosphere and a shared sense of privacy, please ask the staff for permission before taking any photos while you are here.'},
                     zh: { title: '關於攝影', description: '為確保客人隱私及店內氛圍，如需在店內攝影請事先和店內工作人員確認。'}
@@ -446,6 +482,8 @@ const phrasesData = {
             no_outside_food_new: {
                 jp_label: '飲食物の持ち込みはご遠慮いただいております。',
                 svgPath: './11.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '음식 및 음료수를 외부에서 가지고 들어오실 수 없으므로 양해를 부탁드립니다.',
                 content: {
                     en: { title: 'No Outside Food or Drinks', description: 'No outside food or drinks are allowed.'},
                     zh: { title: '禁止攜帶外食', description: '禁止攜帶外食外飲。'}
@@ -454,6 +492,8 @@ const phrasesData = {
             smoking_area_new: {
                 jp_label: '喫煙は所定の場所にてお願いします。',
                 svgPath: './12.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '담배는 지정된 장소를 이용하시도록 부탁드립니다.',
                 content: {
                     en: { title: 'Smoking Area', description: 'Smoking is allowed only in designated locations.'},
                     zh: { title: '吸菸區', description: '請在指定場所抽菸。'}
@@ -462,6 +502,8 @@ const phrasesData = {
             no_smoking_new: {
                 jp_label: '店内は全席禁煙となっております。',
                 svgPath: './13.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '가게 내에서는 전 좌석 금연입니다.',
                 content: {
                     en: { title: 'Non-Smoking', description: 'All seats are non-smoking.'},
                     zh: { title: '全面禁菸', description: '店內全面禁菸。'}
@@ -471,6 +513,8 @@ const phrasesData = {
                 hasInput: true,
                 jp_label: 'お席は<input type="number" id="seat_time_limit_fixed-input" class="time-input" value="2" min="0.5" step="0.5" disabled>時間制とさせていただいております。',
                 svgPath: './14.svg', 
+                // 修正: 韓国語テキスト追加（プレースホルダー付き）
+                ko_label: '자리는 시간제(●시간)로 운영되고 있습니다.',
                 content: {
                     en: { title: 'Seating Time Limit', description: 'We ask that guests please stay no longer than {time} hours.'},
                     zh: { title: '用餐時間', description: '用餐時間為{time}小時。'}
@@ -480,6 +524,8 @@ const phrasesData = {
                 hasInput: true,
                 jp_label: '混雑時は<input type="number" id="seat_time_limit_busy-input" class="time-input" value="2" min="0.5" step="0.5" disabled>時間制とさせていただく場合があります。',
                 svgPath: './15.svg', 
+                // 修正: 韓国語テキスト追加（プレースホルダー付き）
+                ko_label: '혼잡한 경우에는 시간제(●시간)로 운영하는 경우가 있습니다.',
                 content: {
                     en: { title: 'Seating Time Limit (Busy Hours)', description: 'When we are particularly busy, we ask that guests please stay no longer than {time} hours.'},
                     zh: { title: '人數眾多時的用餐時間', description: '用餐人數眾多時将調整為{time}小時。'}
@@ -493,6 +539,8 @@ const phrasesData = {
             language_barrier_new: {
                 jp_label: 'スタッフによる言語対応が難しい場合があります。ご了承ください。',
                 svgPath: './16.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '직원의 언어 대응이 어려운 경우가 있습니다. 양해를 부탁드립니다.',
                 content: {
                     en: { title: 'Language Support', description: 'Our staff may not be able to communicate in any language other than Japanese. We appreciate your understanding.'},
                     zh: { title: '語言溝通', description: '工作人員可能無法順利與您溝通。敬請見諒。'}
@@ -501,6 +549,8 @@ const phrasesData = {
             service_delay_new: {
                 jp_label: '混雑時は、料理の提供やスタッフのご対応にお時間をいただく場合があります。',
                 svgPath: './17.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '혼잡한 때에는 요리 제공이나 직원의 대응에 시간이 소요되는 경우가 있습니다.',
                 content: {
                     en: { title: 'Service Delays', description: 'Please note that, when we are particularly busy, it may take longer than usual to prepare your food, or for staff members to assist you.'},
                     zh: { title: '關於等待時間', description: '用餐人數眾多時，店員の服務及料理の提供可能需要稍加等候。'}
@@ -509,6 +559,8 @@ const phrasesData = {
             call_staff_new: {
                 jp_label: 'ご用の際は直接または呼び鈴（ベル等）でお呼びください。',
                 svgPath: './18.svg', 
+                // 修正: 韓国語テキスト追加
+                ko_label: '용건이 있으신 경우에는 직접 부르시거나 또는 호출 벨 등을 눌러서 불러 주십시오.',
                 content: {
                     en: { title: 'Getting Staff\'s Attention', description: 'If you need anything, please let a staff member know directly, or use the bell at a table.'},
                     zh: { title: '呼叫店員', description: '如需協助請按下呼叫鈴或直接招呼店員。'}
@@ -693,11 +745,16 @@ function renderPaymentCard() {
         `;
 
         if (lang === 'jp') {
-             // 修正: 日本語スタイル適用
              return `<div class="mb-1 last:mb-0 jp-text-sub">
                           <p>会計方式: 以下の決済が可能です。</p>
                           ${optionsHtml}
                       </div>`;
+        } else if (lang === 'ko') {
+            // 修正: 韓国語対応 (メイン表示)
+            return `<div class="mb-1 last:mb-0">
+                    <p class="font-semibold text-gray-800">${data.ko_label}</p>
+                    ${optionsHtml}
+                </div>`;
         }
 
         const content = data.content[lang];
@@ -732,7 +789,7 @@ function renderPreview() {
     document.getElementById('placeholder').style.display = 'none';
     document.getElementById('preview-sheet').style.display = 'flex';
 
-    // ヘッダー更新: 日本語サブタイトルを修正
+    // ヘッダー更新
     const selectedHeader = headerTitleData[selectedLang];
     const jpHeader = headerTitleData['jp'];
     document.getElementById('preview-title').innerHTML = `${selectedHeader} <span class="header-jp-sub">/ ${jpHeader}</span>`;
@@ -757,8 +814,10 @@ function renderPreview() {
             if (!data) return '';
             
             if (lang === 'jp') {
-                // 修正: 日本語は薄いグレー、小さめ
                 return `<div class="mb-2 jp-text-sub"><h3 class="font-bold inline mr-2">${data.title}</h3><span>${data.description}</span></div>`;
+            } else if (lang === 'ko') {
+                // 修正: 韓国語対応 (メイン表示)
+                return `<div class="mb-2"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
             }
             return `<div class="mb-2"><h3 class="font-bold">${data.title}</h3><p>${data.description}</p></div>`;
         }).join('');
@@ -783,8 +842,15 @@ function renderPreview() {
                       const timeValue = document.getElementById(`${key}-input`).value || '?';
                       jp_desc = jp_desc.replace(/(\d*\.?\d*時間)/, `${timeValue}時間`);
                  }
-                 // 修正: 日本語スタイル適用
                  return `<div class="mb-1 last:mb-0 jp-text-sub">${jp_desc}</div>`;
+            } else if (lang === 'ko') {
+                // 修正: 韓国語対応 (メイン表示)
+                let ko_desc = data.ko_label;
+                if (key === 'seat_time_limit_fixed' || key === 'seat_time_limit_busy') { 
+                      const timeValue = document.getElementById(`${key}-input`).value || '?';
+                      ko_desc = ko_desc.replace(/●/, timeValue);
+                 }
+                return `<div class="mb-2 last:mb-0"><p class="font-semibold text-gray-800">${ko_desc}</p></div>`;
             }
             const content = data.content[lang];
             if (!content) return '';
