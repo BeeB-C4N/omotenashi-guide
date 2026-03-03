@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- 修正: Noto Sans TC (繁体字) を追加 -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.js"></script>
@@ -16,15 +15,14 @@
     <!-- スタイル -->
     <style>
       body {
-        /* フォントの優先順位を整理 */
         font-family: "Inter", "Noto Sans JP", "Noto Sans TC", "Noto Sans KR", sans-serif;
       }
 
-      /* 言語ごとのフォント指定（属性セレクタを用いて子要素にも強制適用） */
-      [lang="zh-TW"], [lang="zh-TW"] * { font-family: "Noto Sans TC", sans-serif !important; }
-      [lang="ko"], [lang="ko"] * { font-family: "Noto Sans KR", sans-serif !important; }
-      [lang="ja"], [lang="ja"] * { font-family: "Noto Sans JP", sans-serif !important; }
-      [lang="en"], [lang="en"] * { font-family: "Inter", "Noto Sans JP", sans-serif !important; }
+      /* 言語ごとのフォント指定（子要素すべてに強制適用して文字や記号のズレ・重なりを防ぐ） */
+      .lang-zh, .lang-zh *, :lang(zh-TW), :lang(zh-TW) * { font-family: "Noto Sans TC", sans-serif !important; }
+      .lang-ko, .lang-ko *, :lang(ko), :lang(ko) * { font-family: "Noto Sans KR", sans-serif !important; }
+      .lang-jp, .lang-jp *, :lang(ja), :lang(ja) * { font-family: "Noto Sans JP", sans-serif !important; }
+      .lang-en, .lang-en *, :lang(en), :lang(en) * { font-family: "Inter", "Noto Sans JP", sans-serif !important; }
 
       #preview-sheet {
         background-color: #f4f3ec;
@@ -56,7 +54,6 @@
         color: #ffffff;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         line-height: 1.2;
-        /* padding-top: 0.5rem; */
       }
 
       #card-grid {
@@ -82,9 +79,8 @@
       }
       .welcome-message-card p {
         font-size: 1.05rem;
-        line-height: 1.5; /* 修正: 重なり防止のため少し広げる */
+        line-height: 1.35; /* 初期バージョンに戻す */
         white-space: pre-wrap;
-        letter-spacing: 0.02em; /* 修正: 字間をわずかに広げる */
       }
 
       .payment-options-card {
@@ -92,7 +88,7 @@
         grid-row: span 1 / span 1;
         border: 2px solid #c5b37f;
         border-radius: 0.5rem;
-        padding: 0.5rem 0.75rem 0.75rem;
+        padding: 0.5rem 0.75rem 0.75rem; /* 初期バージョンに戻す */
         background-color: rgba(255, 255, 255, 0.95);
         position: relative;
         display: flex;
@@ -134,7 +130,7 @@
       .card-item {
         border: 2px solid #c5b37f;
         border-radius: 0.5rem;
-        padding: 0.5rem 0.75rem 0.75rem;
+        padding: 0.5rem 0.75rem 0.75rem; /* 初期バージョンに戻す */
         position: relative;
         background-color: rgba(255, 255, 255, 0.95);
         display: flex;
@@ -146,22 +142,19 @@
         z-index: 10;
         flex-grow: 1;
         font-size: 1rem;
-        line-height: 1.5; /* 修正: 行間を広げて記号の重なりを防止 */
+        line-height: 1.2; /* 初期バージョンに戻す */
       }
       .title-wrap {
         display: grid;
         gap: 0.8rem;
         grid-template-columns: 4rem 1fr;
-        /* align-items: center;
-         */
         align-items: start;
-        /* margin-bottom: 0.5rem; */
       }
 
       .title-wrap__title {
         padding-top: 0.5rem;
         color: #363b5a;
-        line-height: 1.2 !important;
+        line-height: 1 !important;
       }
       @media screen and (max-width: 767px) {
         .title-wrap {
@@ -183,7 +176,7 @@
         color: #6b7280;
         font-size: 0.6rem;
         margin-top: 0.4rem;
-        line-height: 1.4; /* 修正 */
+        line-height: 1.2; /* 初期バージョンに戻す */
         font-weight: normal;
       }
 
@@ -224,12 +217,8 @@
         margin-bottom: 1rem;
       }
       @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
       .pagination-button:disabled {
         opacity: 0.5;
@@ -434,8 +423,8 @@
           credit: "■ This information was created using services provided by Ishikawa Prefecture.",
         },
         zh: {
-          note: "■ 標示內容有時會有變動。如有任何疑問，請詢問店內人員。",
-          credit: "■ 本譯文來自於石川縣提供之服務。",
+          note: "■ 刊載內容可能會有所變更。如有任何疑問，請洽詢店內人員。",
+          credit: "■ 本指南是使用石川縣提供的服務所製作。",
         },
         ko: {
           note: "■ 게재 내용은 변경되는 경우가 있습니다. 불명확한 점이 있으시면 직원에게 문의해 주십시오.",
